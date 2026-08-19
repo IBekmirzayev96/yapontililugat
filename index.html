@@ -26,9 +26,15 @@
                 <p class="text-xs text-gray-400">N5 Kanji, Lug'at & Grammatika mashq dasturi</p>
             </div>
         </div>
-        <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-amber-400 font-semibold">
-            <i class="fa-solid fa-fire text-amber-500"></i>
-            <span id="streak">0</span> <span class="text-gray-400 text-xs font-normal">Ochko</span>
+        <div class="flex items-center gap-3">
+            <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-rose-400 font-semibold" title="Ketma-ket kirilgan kunlar">
+                <i class="fa-solid fa-calendar-check text-rose-500"></i>
+                <span id="daily-streak">0</span> <span class="text-gray-400 text-xs font-normal">Kun</span>
+            </div>
+            <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-amber-400 font-semibold">
+                <i class="fa-solid fa-fire text-amber-500"></i>
+                <span id="streak">0</span> <span class="text-gray-400 text-xs font-normal">Ochko</span>
+            </div>
         </div>
     </header>
 
@@ -53,7 +59,7 @@
             <button type="button" id="mode-grammar" onclick="switchMode(event, 'grammar')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-book-bookmark"></i> Grammatika
             </button>
-            <button type="button" id="mode-test" onclick="switchMode(event, 'test')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-quiz" onclick="switchMode(event, 'quiz')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-graduation-cap"></i> Test
             </button>
             <button type="button" id="mode-audio" onclick="switchMode(event, 'audio')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
@@ -61,6 +67,12 @@
             </button>
             <button type="button" id="mode-reverse" onclick="switchMode(event, 'reverse')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-language"></i> UZ → JP
+            </button>
+            <button type="button" id="mode-speech" onclick="switchMode(event, 'speech')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fa-solid fa-microphone"></i> Talaffuz
+            </button>
+            <button type="button" id="mode-speed" onclick="switchMode(event, 'speed')" class="px-3 py-2 rounded-lg text-xs font-medium text-amber-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fa-solid fa-stopwatch"></i> Taymer (30s)
             </button>
             <button type="button" id="mode-list" onclick="switchMode(event, 'list')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-list-check"></i> Qidiruv
@@ -73,7 +85,7 @@
             <option value="n5_vocab">JLPT N5 — Lug'at (Kotoba)</option>
         </select>
 
-        <!-- 1. FLASHCARD SECTION (Flip Card) -->
+        <!-- 1. FLASHCARD SECTION -->
         <div id="section-flashcard" class="w-full flex flex-col items-center gap-4">
             <div class="w-full h-[280px] perspective cursor-pointer" onclick="flipCard()">
                 <div id="card-inner" class="w-full h-full relative transform-style-3d transition-transform duration-500 shadow-2xl rounded-2xl">
@@ -119,7 +131,7 @@
             </div>
 
             <div class="w-full bg-[#0f172a] p-4 rounded-xl border border-gray-800 text-sm text-gray-300 leading-relaxed" id="grammar-explanation">
-                Biror harakatni bajarish istagini (xohlayman) bildiradi. Faqat birinchi va ikkinchi shaxs uchun ishlatiladi.
+                Biror harakatni bajarish istagini (xohlayman) bildiradi.
             </div>
 
             <div class="w-full bg-slate-900/60 p-4 rounded-xl border border-rose-500/20 flex flex-col gap-2">
@@ -146,7 +158,7 @@
             </div>
         </div>
 
-        <!-- 3. TEST SECTION -->
+        <!-- 3. STANDART TEST SECTION -->
         <div id="section-quiz" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">STANDART TEST</span>
             <div id="quiz-question" class="text-5xl font-extrabold text-white my-3">男</div>
@@ -172,7 +184,48 @@
             <div id="reverse-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
         </div>
 
-        <!-- 6. QIDIRUV VA LUG'AT SECTION -->
+        <!-- 6. TALAFFUZNI TEKSHIRISH SECTION -->
+        <div id="section-speech" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center text-center">
+            <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">TALAFFUZ AMALIYOTI</span>
+            <div id="speech-target" class="text-4xl font-extrabold text-white my-2">男</div>
+            <div id="speech-target-reading" class="text-sm text-amber-400 mb-4">おとこ (otoko)</div>
+            
+            <div id="speech-status" class="text-xs text-gray-400 mb-4 min-h-[20px]">
+                Mikrofon tugmasini bosing va so'zni yaponcha ayting...
+            </div>
+
+            <button type="button" id="btn-mic" onclick="startSpeechRecognition()" class="bg-rose-600 hover:bg-rose-500 text-white w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-lg transition my-2">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+
+            <div id="speech-result" class="mt-4 p-3 bg-[#0f172a] rounded-xl border border-gray-800 w-full text-sm font-semibold hidden"></div>
+            
+            <button type="button" onclick="generateSpeechTask()" class="mt-4 text-xs text-gray-400 hover:text-white underline">
+                Boshqa so'zga o'tish
+            </button>
+        </div>
+
+        <!-- 7. TAYMERLI SHPORD TEST SECTION (SPEED CHALLENGE) -->
+        <div id="section-speed" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
+            <div class="w-full flex justify-between items-center mb-2">
+                <span class="text-xs font-semibold text-amber-400 tracking-widest uppercase">TEZKOR TEST</span>
+                <span class="text-xl font-mono font-bold text-rose-500"><i class="fa-solid fa-clock"></i> <span id="timer-display">30</span>s</span>
+            </div>
+            
+            <div id="speed-start-container" class="text-center my-6">
+                <p class="text-sm text-gray-300 mb-4">30 soniya ichida imkon qadar ko'proq to'g'ri javob toping!</p>
+                <button type="button" onclick="startSpeedChallenge()" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold px-6 py-3 rounded-xl text-sm transition">
+                    Boshlash!
+                </button>
+            </div>
+
+            <div id="speed-game-container" class="w-full hidden flex-col items-center">
+                <div id="speed-question" class="text-4xl font-extrabold text-white my-3">男</div>
+                <div id="speed-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-2"></div>
+            </div>
+        </div>
+
+        <!-- 8. QIDIRUV VA LUG'AT SECTION -->
         <div id="section-list" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col gap-4">
             <div class="flex gap-2">
                 <div class="relative flex-1">
@@ -247,7 +300,7 @@
                 {
                     title: '〜てください (Te kudasai)',
                     formula: 'Fe\'l (Te-shakli) + ください',
-                    explanation: 'Iltimos, buyruq yoki taklifni bildirish uchun ishlatiladi (iltimos, biling/bajarib bering).',
+                    explanation: 'Iltimos, buyruq yoki taklifni bildirish uchun ishlatiladi.',
                     example_jp: 'ここに名前を書いてください。',
                     example_reading: 'Koko ni namae o kaite kudasai.',
                     example_uz: 'Iltimos, bu yerga ismingizni yozing.'
@@ -286,7 +339,43 @@
         let score = 0;
         let mistakes = [];
         let currentAudioQuestion = null;
+        let currentSpeechTarget = null;
         let showMistakesOnly = false;
+
+        // Speed Challenge variables
+        let speedTimer = null;
+        let timeLeft = 30;
+        let speedScore = 0;
+
+        // Streak tekshiruvi (LocalStorage)
+        function checkDailyStreak() {
+            const lastVisit = localStorage.getItem('jp_last_visit');
+            let streak = parseInt(localStorage.getItem('jp_streak') || '0');
+            const today = new Date().toDateString();
+
+            if (lastVisit) {
+                const lastDate = new Date(lastVisit);
+                const currentDate = new Date();
+                const diffTime = Math.abs(currentDate - lastDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 1 && lastVisit !== today) {
+                    streak += 1;
+                    localStorage.setItem('jp_streak', streak);
+                    localStorage.setItem('jp_last_visit', today);
+                } else if (diffDays > 1) {
+                    streak = 1;
+                    localStorage.setItem('jp_streak', streak);
+                    localStorage.setItem('jp_last_visit', today);
+                }
+            } else {
+                streak = 1;
+                localStorage.setItem('jp_streak', streak);
+                localStorage.setItem('jp_last_visit', today);
+            }
+
+            document.getElementById('daily-streak').innerText = streak;
+        }
 
         function initDailyWord() {
             const allWords = [...database.n5_kanji, ...database.n5_vocab];
@@ -309,37 +398,6 @@
             
             document.getElementById('card-category-label').innerText = 
                 currentCategory === 'n5_kanji' ? 'YAPONCHA KANJI (N5)' : 'YAPONCHA LUG\'AT (N5)';
-        }
-
-        function updateGrammarCard() {
-            const item = database.grammar[currentGrammarIndex];
-            document.getElementById('grammar-title').innerText = item.title;
-            document.getElementById('grammar-formula').innerText = item.formula;
-            document.getElementById('grammar-explanation').innerText = item.explanation;
-            document.getElementById('grammar-example-jp').innerText = item.example_jp;
-            document.getElementById('grammar-example-reading').innerText = item.example_reading;
-            document.getElementById('grammar-example-uz').innerText = item.example_uz;
-            document.getElementById('grammar-index').innerText = currentGrammarIndex + 1;
-            document.getElementById('grammar-total').innerText = database.grammar.length;
-        }
-
-        function nextGrammar() {
-            if (currentGrammarIndex < database.grammar.length - 1) {
-                currentGrammarIndex++;
-                updateGrammarCard();
-            }
-        }
-
-        function prevGrammar() {
-            if (currentGrammarIndex > 0) {
-                currentGrammarIndex--;
-                updateGrammarCard();
-            }
-        }
-
-        function speakGrammarExample() {
-            const text = database.grammar[currentGrammarIndex].example_jp;
-            speakWord(text);
         }
 
         function flipCard() {
@@ -373,16 +431,42 @@
             }
         }
 
-        // Internet orqali (Google Translate TTS) tiniq yaponcha audio o'qish funksiyasi
+        function updateGrammarCard() {
+            const item = database.grammar[currentGrammarIndex];
+            document.getElementById('grammar-title').innerText = item.title;
+            document.getElementById('grammar-formula').innerText = item.formula;
+            document.getElementById('grammar-explanation').innerText = item.explanation;
+            document.getElementById('grammar-example-jp').innerText = item.example_jp;
+            document.getElementById('grammar-example-reading').innerText = item.example_reading;
+            document.getElementById('grammar-example-uz').innerText = item.example_uz;
+            document.getElementById('grammar-index').innerText = currentGrammarIndex + 1;
+            document.getElementById('grammar-total').innerText = database.grammar.length;
+        }
+
+        function nextGrammar() {
+            if (currentGrammarIndex < database.grammar.length - 1) {
+                currentGrammarIndex++;
+                updateGrammarCard();
+            }
+        }
+
+        function prevGrammar() {
+            if (currentGrammarIndex > 0) {
+                currentGrammarIndex--;
+                updateGrammarCard();
+            }
+        }
+
+        function speakGrammarExample() {
+            speakWord(database.grammar[currentGrammarIndex].example_jp);
+        }
+
         function speakWord(text = null) {
             const wordToSpeak = text || database[currentCategory][currentIndex].word;
-            
-            // Onlayn audio manbasi
             const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(wordToSpeak)}&tl=ja&client=tw-ob`;
             
             const audio = new Audio(audioUrl);
             audio.play().catch(() => {
-                // Agar internet o'chiq bo'lsa, brauzer ichki tizimidan foydalanish:
                 if ('speechSynthesis' in window) {
                     window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(wordToSpeak);
@@ -453,6 +537,114 @@
             });
         }
 
+        function generateSpeechTask() {
+            const list = database[currentCategory];
+            currentSpeechTarget = list[Math.floor(Math.random() * list.length)];
+            document.getElementById('speech-target').innerText = currentSpeechTarget.word;
+            document.getElementById('speech-target-reading').innerText = `${currentSpeechTarget.reading} (${currentSpeechTarget.meaning})`;
+            
+            const resDiv = document.getElementById('speech-result');
+            resDiv.classList.add('hidden');
+            document.getElementById('speech-status').innerText = "Mikrofon tugmasini bosing va yaponcha ayting...";
+        }
+
+        function startSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Brauzeringiz ovoz tanish funksiyasini qo'llab-quvvatlamaydi. Chrome-dan foydalanib ko'ring.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP';
+            recognition.interimResults = false;
+
+            const micBtn = document.getElementById('btn-mic');
+            const statusText = document.getElementById('speech-status');
+            const resDiv = document.getElementById('speech-result');
+
+            micBtn.classList.add('animate-pulse', 'bg-amber-500');
+            statusText.innerText = "Eshitilmoqda... Gapiring!";
+
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                const spokenText = event.results[0][0].transcript;
+                micBtn.classList.remove('animate-pulse', 'bg-amber-500');
+                
+                resDiv.classList.remove('hidden');
+                
+                if (spokenText.includes(currentSpeechTarget.word) || spokenText.includes(currentSpeechTarget.reading.split('/')[0].trim())) {
+                    resDiv.className = "mt-4 p-3 bg-emerald-900/50 border border-emerald-500 rounded-xl w-full text-sm text-emerald-300";
+                    resDiv.innerHTML = `<i class="fa-solid fa-circle-check"></i> Barakalla! Siz dedingiz: <strong>${spokenText}</strong> (+15 Ochko)`;
+                    score += 15;
+                    document.getElementById('streak').innerText = score;
+                } else {
+                    resDiv.className = "mt-4 p-3 bg-rose-900/50 border border-rose-500 rounded-xl w-full text-sm text-rose-300";
+                    resDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Qaytadan urinib ko'ring. Siz dedingiz: <strong>${spokenText}</strong>`;
+                }
+                statusText.innerText = "Tayyor!";
+            };
+
+            recognition.onerror = function() {
+                micBtn.classList.remove('animate-pulse', 'bg-amber-500');
+                statusText.innerText = "Xatolik yuz berdi. Qaytadan bosing.";
+            };
+        }
+
+        function startSpeedChallenge() {
+            document.getElementById('speed-start-container').classList.add('hidden');
+            document.getElementById('speed-game-container').classList.remove('hidden');
+            document.getElementById('speed-game-container').classList.add('flex');
+            
+            timeLeft = 30;
+            speedScore = 0;
+            document.getElementById('timer-display').innerText = timeLeft;
+
+            speedTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-display').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(speedTimer);
+                    endSpeedChallenge();
+                }
+            }, 1000);
+
+            nextSpeedQuestion();
+        }
+
+        function nextSpeedQuestion() {
+            const list = database[currentCategory];
+            const correct = list[Math.floor(Math.random() * list.length)];
+            document.getElementById('speed-question').innerText = correct.word;
+
+            let options = getOptions(correct, list);
+            const container = document.getElementById('speed-options');
+            container.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm transition text-left font-medium";
+                btn.innerText = opt.meaning;
+                btn.onclick = () => {
+                    if (opt === correct) speedScore += 1;
+                    nextSpeedQuestion();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function endSpeedChallenge() {
+            document.getElementById('speed-game-container').classList.add('hidden');
+            document.getElementById('speed-game-container').classList.remove('flex');
+            document.getElementById('speed-start-container').classList.remove('hidden');
+            
+            score += speedScore * 5;
+            document.getElementById('streak').innerText = score;
+            alert(`Vaqt tugadi! Siz ${speedScore} ta to'g'ri javob topdingiz va ${speedScore * 5} ochko ishlandingiz!`);
+        }
+
         function getOptions(correct, list) {
             let options = [correct];
             while (options.length < 4 && options.length < list.length) {
@@ -480,7 +672,6 @@
         function renderList() {
             const listContainer = document.getElementById('words-list');
             listContainer.innerHTML = '';
-            
             const sourceList = showMistakesOnly ? mistakes : database[currentCategory];
 
             if(sourceList.length === 0 && showMistakesOnly) {
@@ -523,10 +714,12 @@
 
         function switchMode(e, mode) {
             if (e) e.preventDefault();
-            const sections = ['flashcard', 'grammar', 'quiz', 'audio', 'reverse', 'list'];
+            if (speedTimer) clearInterval(speedTimer);
+
+            const sections = ['flashcard', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'speed', 'list'];
             sections.forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
 
-            const buttons = ['flashcard', 'grammar', 'test', 'audio', 'reverse', 'list'];
+            const buttons = ['flashcard', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'speed', 'list'];
             buttons.forEach(b => {
                 document.getElementById(`mode-${b}`).className = 
                     "px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap";
@@ -534,38 +727,25 @@
 
             const levelSelect = document.getElementById('level-select');
 
-            if (mode === 'flashcard') {
-                document.getElementById('section-flashcard').classList.remove('hidden');
-                document.getElementById('mode-flashcard').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-                levelSelect.classList.remove('hidden');
-            } else if (mode === 'grammar') {
-                document.getElementById('section-grammar').classList.remove('hidden');
-                document.getElementById('mode-grammar').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+            document.getElementById(`section-${mode}`).classList.remove('hidden');
+            document.getElementById(`mode-${mode}`).className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+
+            if (mode === 'grammar') {
                 levelSelect.classList.add('hidden');
                 updateGrammarCard();
-            } else if (mode === 'test') {
-                document.getElementById('section-quiz').classList.remove('hidden');
-                document.getElementById('mode-test').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+            } else {
                 levelSelect.classList.remove('hidden');
-                generateQuiz();
-            } else if (mode === 'audio') {
-                document.getElementById('section-audio').classList.remove('hidden');
-                document.getElementById('mode-audio').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-                levelSelect.classList.remove('hidden');
-                generateAudioQuiz();
-            } else if (mode === 'reverse') {
-                document.getElementById('section-reverse').classList.remove('hidden');
-                document.getElementById('mode-reverse').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-                levelSelect.classList.remove('hidden');
-                generateReverseQuiz();
-            } else if (mode === 'list') {
-                document.getElementById('section-list').classList.remove('hidden');
-                document.getElementById('mode-list').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-                levelSelect.classList.remove('hidden');
-                renderList();
             }
+
+            if (mode === 'quiz') generateQuiz();
+            if (mode === 'audio') generateAudioQuiz();
+            if (mode === 'reverse') generateReverseQuiz();
+            if (mode === 'speech') generateSpeechTask();
+            if (mode === 'list') renderList();
         }
 
+        // Boshlang'ich yuklash
+        checkDailyStreak();
         initDailyWord();
         updateCard();
     </script>
