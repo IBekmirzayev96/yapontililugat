@@ -3,15 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yapon Tili Interaktiv Platformasi</title>
+    <title>Yapon Tili Viktorina</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .perspective { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg); }
-    </style>
 </head>
 <body class="bg-[#0f172a] text-white font-sans min-h-screen flex flex-col justify-between p-4">
 
@@ -22,145 +16,81 @@
                 日本語
             </div>
             <div>
-                <h1 class="text-xl font-bold tracking-wide">Yapon Tili Platformasi</h1>
-                <p class="text-xs text-gray-400">N5 Kanji & Lug'at bo'yicha mukammal darslik</p>
+                <h1 class="text-xl font-bold tracking-wide">Yapon Tili Viktorina</h1>
+                <p class="text-xs text-gray-400">N5 Kanji & Lug'at mashq dasturi</p>
             </div>
         </div>
         <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-amber-400 font-semibold">
-            <i class="fa-solid fa-fire text-amber-500"></i>
-            <span id="streak">0</span> <span class="text-gray-400 text-xs font-normal">Ochko</span>
+            <i class="fa-solid fa-[#f59e0b] fa-fire"></i>
+            <span id="streak">0</span> <span class="text-gray-400 text-xs font-normal">Ketma-ket</span>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="max-w-2xl mx-auto w-full flex-1 flex flex-col items-center justify-center my-6 gap-6">
         
-        <!-- Daily Card Banner (Kun So'zi) -->
-        <div class="w-full bg-gradient-to-r from-rose-900/40 to-slate-800 border border-rose-500/30 rounded-xl p-4 flex items-center justify-between shadow-lg">
-            <div>
-                <span class="text-[10px] font-extrabold text-rose-400 tracking-widest uppercase block">KUN SO'ZI</span>
-                <span id="daily-word" class="text-xl font-bold text-white">男</span>
-                <span id="daily-reading" class="text-xs text-gray-300 ml-2">(おとこ)</span>
-            </div>
-            <div id="daily-meaning" class="text-sm text-emerald-400 font-medium">Erkak, yigit</div>
-        </div>
-
         <!-- Mode Switcher -->
-        <div class="bg-[#1e293b] p-1.5 rounded-xl flex gap-1.5 border border-gray-700/50 w-full overflow-x-auto justify-start md:justify-center">
-            <button id="mode-flashcard" onclick="switchMode('flashcard')" class="px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap">
+        <div class="bg-[#1e293b] p-1.5 rounded-xl flex gap-2 border border-gray-700/50 w-fit">
+            <button id="mode-test" onclick="switchMode('test')" class="px-6 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap"></i> Test Rejimi
+            </button>
+            <button id="mode-flashcard" onclick="switchMode('flashcard')" class="px-6 py-2 rounded-lg text-sm font-medium bg-[#e11d48] text-white shadow-lg flex items-center gap-2">
                 <i class="fa-solid fa-clone"></i> Flashcard
             </button>
-            <button id="mode-test" onclick="switchMode('test')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                <i class="fa-solid fa-graduation-cap"></i> Test
-            </button>
-            <button id="mode-audio" onclick="switchMode('audio')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                <i class="fa-solid fa-headphones"></i> Audio-Test
-            </button>
-            <button id="mode-reverse" onclick="switchMode('reverse')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                <i class="fa-solid fa-language"></i> UZ → JP
-            </button>
-            <button id="mode-list" onclick="switchMode('list')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                <i class="fa-solid fa-list-check"></i> Lug'at
-            </button>
         </div>
 
-        <!-- Level Selector -->
-        <select id="level-select" onchange="changeCategory()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer w-full">
+        <!-- Level & Category Selector -->
+        <select id="level-select" onchange="changeCategory()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer">
             <option value="n5_kanji">JLPT N5 — Kanji (Iyerogliflar)</option>
             <option value="n5_vocab">JLPT N5 — Lug'at (Kotoba)</option>
         </select>
 
-        <!-- 1. FLASHCARD SECTION (Flip Card) -->
-        <div id="section-flashcard" class="w-full flex flex-col items-center gap-4">
-            <div class="w-full h-[280px] perspective cursor-pointer" onclick="flipCard()">
-                <div id="card-inner" class="w-full h-full relative transform-style-3d transition-transform duration-500 shadow-2xl rounded-2xl">
-                    <div class="absolute w-full h-full backface-hidden bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-                        <span id="card-category-label" class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-2">YAPONCHA</span>
-                        <div id="kanji-display" class="text-6xl font-extrabold text-white my-2">男</div>
-                        <div id="reading-display" class="text-gray-300 text-lg tracking-wide">おとこ / ダン</div>
-                        <span class="text-[11px] text-gray-500 mt-4"><i class="fa-solid fa-rotate"></i> Ma'nosini ko'rish uchun ustiga bosing</span>
-                    </div>
-                    <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-[#1e293b] border border-rose-500/50 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-                        <span class="text-xs font-semibold text-emerald-400 tracking-widest uppercase mb-2">O'ZBEKCHA MA'NOSI</span>
-                        <div id="meaning-display" class="text-2xl font-bold text-emerald-300">Erkak, yigit</div>
-                    </div>
-                </div>
+        <!-- Flashcard Box -->
+        <div class="bg-[#1e293b]/70 border border-gray-700/80 rounded-2xl p-10 w-full flex flex-col items-center justify-between min-h-[320px] shadow-2xl relative backdrop-blur-sm">
+            <span id="card-category-label" class="text-xs font-semibold text-rose-400 tracking-widest uppercase">YAPONCHA KANJI</span>
+
+            <div class="text-center my-auto flex flex-col items-center gap-3">
+                <div id="kanji-display" class="text-6xl font-extrabold text-white my-2">男</div>
+                <div id="reading-display" class="text-gray-300 text-lg tracking-wide">おとこ / ダン, ナン</div>
+                <div id="meaning-display" class="text-base text-emerald-400 font-medium">Erkak, yigit</div>
             </div>
 
-            <div class="flex items-center justify-between w-full gap-4">
-                <button onclick="prevCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
-                    <i class="fa-solid fa-chevron-left"></i> Oldingisi
-                </button>
-                <button onclick="speakWord()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition text-rose-400">
-                    <i class="fa-solid fa-volume-high"></i> Eshitish
-                </button>
-                <button onclick="nextCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
-                    Keyingisi <i class="fa-solid fa-chevron-right"></i>
-                </button>
-            </div>
-            <div class="text-gray-400 text-xs font-medium tracking-wider">
+            <button onclick="speakWord()" class="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition mt-4 hover:bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700/50">
+                <i class="fa-solid fa-volume-high text-rose-500"></i> Eshitish
+            </button>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center justify-between w-full gap-4">
+            <button onclick="prevCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
+                <i class="fa-solid fa-chevron-left"></i> Oldingisi
+            </button>
+            <div class="text-gray-400 text-sm font-medium tracking-wider">
                 <span id="current-index" class="text-white">1</span> / <span id="total-cards">8</span>
             </div>
-        </div>
-
-        <!-- 2. STANDARD QUIZ SECTION -->
-        <div id="section-quiz" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
-            <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">STANDART TEST</span>
-            <div id="quiz-question" class="text-5xl font-extrabold text-white my-3">男</div>
-            <p class="text-xs text-gray-400 mb-4">To'g'ri tarjimani tanlang:</p>
-            <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
-        </div>
-
-        <!-- 3. AUDIO-TEST SECTION -->
-        <div id="section-audio" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
-            <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">AUDIO TEST</span>
-            <p class="text-xs text-gray-400 mb-4">Tugmani bosib so'zni eshiting va to'g'ri javobni toping:</p>
-            <button onclick="playAudioQuestion()" class="bg-rose-600 hover:bg-rose-500 text-white p-5 rounded-full my-2 shadow-lg transition">
-                <i class="fa-solid fa-volume-high text-2xl"></i>
+            <button onclick="nextCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
+                Keyingisi <i class="fa-solid fa-chevron-right"></i>
             </button>
-            <div id="audio-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-4"></div>
-        </div>
-
-        <!-- 4. REVERSE QUIZ SECTION (UZ -> JP) -->
-        <div id="section-reverse" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
-            <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">O'ZBEKCHA → YAPONCHA TEST</span>
-            <div id="reverse-question" class="text-2xl font-bold text-emerald-400 my-4 text-center">Erkak, yigit</div>
-            <p class="text-xs text-gray-400 mb-4">Tegishli yaponcha so'zni/kanjini tanlang:</p>
-            <div id="reverse-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
-        </div>
-
-        <!-- 5. SEARCH & LIST & SMART REPEAT SECTION -->
-        <div id="section-list" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col gap-4">
-            <div class="flex gap-2">
-                <div class="relative flex-1">
-                    <input type="text" id="search-input" onkeyup="filterList()" placeholder="So'z yoki tarjimani qidiring..." class="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500">
-                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-3 text-gray-500 text-sm"></i>
-                </div>
-                <button onclick="toggleMistakesFilter()" id="btn-mistakes-filter" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-2.5 rounded-xl text-xs font-semibold text-amber-400 flex items-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Xatolar (<span id="mistake-count">0</span>)
-                </button>
-            </div>
-            <div id="words-list" class="max-h-[300px] overflow-y-auto space-y-2 pr-1"></div>
         </div>
 
     </main>
 
     <!-- Footer -->
     <footer class="text-center text-xs text-gray-500 py-4 border-t border-gray-800/50">
-        Yapon tili o'rganish interaktiv platformasi • JLPT N5
+        Yapon tili o'rganish uchun interaktiv platforma • JLPT N5
     </footer>
 
-    <!-- JS Mantiqi -->
+    <!-- JavaScript Mantiqi -->
     <script>
         const database = {
             n5_kanji: [
-                { word: '男', reading: 'おとこ / ダン', meaning: "Erkak, yigit, odam" },
+                { word: '男', reading: 'おとこ / ダン, ナン', meaning: "Erkak, yigit, odam" },
                 { word: '林', reading: 'はやし / リン', meaning: "Yog'och, kichik o'rmon" },
                 { word: '森', reading: 'もり / シン', meaning: "O'rmon, changalzor" },
                 { word: '休', reading: 'やす・む / キュウ', meaning: "Dam olish, bayram" },
                 { word: '体', reading: 'からだ / タイ', meaning: "Tana, jismoniy holat" },
-                { word: '住', reading: 'す・む / ジュウ', meaning: "Yashamoq, manzil" },
-                { word: '明', reading: 'あか・るい / メイ', meaning: "Yorqin, yorug', aniq" },
+                { word: '住', reading: 'す・む / ジュウ', meaning: "Yashamoq, manzil, uy-joy" },
+                { word: '明', reading: 'あか・るい / メイ, ミョウ', meaning: "Yorqin, yorug', aniq, ertaga" },
                 { word: '字', reading: 'あざ / ジ', meaning: "Harf, belgi, iyeroglif" }
             ],
             n5_vocab: [
@@ -196,25 +126,8 @@
 
         let currentCategory = 'n5_kanji';
         let currentIndex = 0;
-        let isFlipped = false;
-        let score = 0;
-        let mistakes = [];
-        let currentAudioQuestion = null;
-        let showMistakesOnly = false;
-
-        // Kun So'zini tanlash
-        function initDailyWord() {
-            const allWords = [...database.n5_kanji, ...database.n5_vocab];
-            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-            document.getElementById('daily-word').innerText = randomWord.word;
-            document.getElementById('daily-reading').innerText = `(${randomWord.reading})`;
-            document.getElementById('daily-meaning').innerText = randomWord.meaning;
-        }
 
         function updateCard() {
-            isFlipped = false;
-            document.getElementById('card-inner').classList.remove('rotate-y-180');
-            
             const cardsData = database[currentCategory];
             const card = cardsData[currentIndex];
             
@@ -228,25 +141,15 @@
                 currentCategory === 'n5_kanji' ? 'YAPONCHA KANJI (N5)' : 'YAPONCHA LUG\'AT (N5)';
         }
 
-        function flipCard() {
-            isFlipped = !isFlipped;
-            const cardInner = document.getElementById('card-inner');
-            if(isFlipped) cardInner.classList.add('rotate-y-180');
-            else cardInner.classList.remove('rotate-y-180');
-        }
-
         function changeCategory() {
             currentCategory = document.getElementById('level-select').value;
             currentIndex = 0;
             updateCard();
-            generateQuiz();
-            generateAudioQuiz();
-            generateReverseQuiz();
-            renderList();
         }
 
         function nextCard() {
-            if (currentIndex < database[currentCategory].length - 1) {
+            const cardsData = database[currentCategory];
+            if (currentIndex < cardsData.length - 1) {
                 currentIndex++;
                 updateCard();
             }
@@ -259,181 +162,39 @@
             }
         }
 
-        function speakWord(text = null) {
-            const card = text || database[currentCategory][currentIndex].word;
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(card);
+        function speakWord() {
+            const card = database[currentCategory][currentIndex];
+            window.speechSynthesis.cancel(); // Avvalgi audioni to'xtatish
+
+            const utterance = new SpeechSynthesisUtterance(card.word);
             utterance.lang = 'ja-JP';
             utterance.rate = 0.8;
+
+            const voices = window.speechSynthesis.getVoices();
+            const jaVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            if (jaVoice) {
+                utterance.voice = jaVoice;
+            }
+
             window.speechSynthesis.speak(utterance);
         }
 
-        // 1. Standart Test
-        function generateQuiz() {
-            const list = database[currentCategory];
-            const correct = list[Math.floor(Math.random() * list.length)];
-            document.getElementById('quiz-question').innerText = correct.word;
-
-            let options = getOptions(correct, list);
-            const container = document.getElementById('quiz-options');
-            container.innerHTML = '';
-
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm transition text-left";
-                btn.innerText = opt.meaning;
-                btn.onclick = () => handleAnswer(opt === correct, btn, correct, generateQuiz);
-                container.appendChild(btn);
-            });
-        }
-
-        // 2. Audio Test
-        function generateAudioQuiz() {
-            const list = database[currentCategory];
-            currentAudioQuestion = list[Math.floor(Math.random() * list.length)];
-
-            let options = getOptions(currentAudioQuestion, list);
-            const container = document.getElementById('audio-options');
-            container.innerHTML = '';
-
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm transition text-left";
-                btn.innerText = opt.meaning;
-                btn.onclick = () => handleAnswer(opt === currentAudioQuestion, btn, currentAudioQuestion, generateAudioQuiz);
-                container.appendChild(btn);
-            });
-        }
-
-        function playAudioQuestion() {
-            if(currentAudioQuestion) speakWord(currentAudioQuestion.word);
-        }
-
-        // 3. O'zbekcha -> Yaponcha Test
-        function generateReverseQuiz() {
-            const list = database[currentCategory];
-            const correct = list[Math.floor(Math.random() * list.length)];
-            document.getElementById('reverse-question').innerText = correct.meaning;
-
-            let options = getOptions(correct, list);
-            const container = document.getElementById('reverse-options');
-            container.innerHTML = '';
-
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3.5 rounded-xl text-base transition text-center font-bold";
-                btn.innerText = `${opt.word} (${opt.reading})`;
-                btn.onclick = () => handleAnswer(opt === correct, btn, correct, generateReverseQuiz);
-                container.appendChild(btn);
-            });
-        }
-
-        // Yordamchi variantlar shakllantirish
-        function getOptions(correct, list) {
-            let options = [correct];
-            while (options.length < 4 && options.length < list.length) {
-                let randomItem = list[Math.floor(Math.random() * list.length)];
-                if (!options.includes(randomItem)) options.push(randomItem);
-            }
-            return options.sort(() => Math.random() - 0.5);
-        }
-
-        // Javobni tekshirish va Xatolarni yig'ish (Smart Repeat)
-        function handleAnswer(isCorrect, btn, questionObj, nextQuizFunc) {
-            if (isCorrect) {
-                btn.classList.add('bg-emerald-600', 'border-emerald-500');
-                score += 10;
-                document.getElementById('streak').innerText = score;
-                setTimeout(nextQuizFunc, 800);
-            } else {
-                btn.classList.add('bg-rose-600', 'border-rose-500');
-                if (!mistakes.includes(questionObj)) {
-                    mistakes.push(questionObj);
-                    document.getElementById('mistake-count').innerText = mistakes.length;
-                }
-            }
-        }
-
-        // Qidiruv va Smart Repeat Ro'yxati
-        function renderList() {
-            const listContainer = document.getElementById('words-list');
-            listContainer.innerHTML = '';
-            
-            const sourceList = showMistakesOnly ? mistakes : database[currentCategory];
-
-            if(sourceList.length === 0 && showMistakesOnly) {
-                listContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-4">Hozircha hech qanday xato yo'q!</div>`;
-                return;
-            }
-
-            sourceList.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "bg-[#0f172a] border border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm";
-                div.innerHTML = `
-                    <div>
-                        <strong class="text-rose-400 text-base">${item.word}</strong> 
-                        <span class="text-xs text-gray-400">(${item.reading})</span>
-                    </div> 
-                    <div class="text-emerald-400 font-medium">${item.meaning}</div>`;
-                listContainer.appendChild(div);
-            });
-        }
-
-        function filterList() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const items = document.getElementById('words-list').children;
-            Array.from(items).forEach(item => {
-                const text = item.innerText.toLowerCase();
-                item.style.display = text.includes(query) ? 'flex' : 'none';
-            });
-        }
-
-        function toggleMistakesFilter() {
-            showMistakesOnly = !showMistakesOnly;
-            const btn = document.getElementById('btn-mistakes-filter');
-            if(showMistakesOnly) {
-                btn.classList.add('bg-amber-600', 'text-white');
-            } else {
-                btn.classList.remove('bg-amber-600', 'text-white');
-            }
-            renderList();
-        }
-
-        // Mode switch
         function switchMode(mode) {
-            const sections = ['flashcard', 'quiz', 'audio', 'reverse', 'list'];
-            sections.forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
-
-            const buttons = ['flashcard', 'test', 'audio', 'reverse', 'list'];
-            buttons.forEach(b => {
-                document.getElementById(`mode-${b}`).className = 
-                    "px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap";
-            });
-
-            if (mode === 'flashcard') {
-                document.getElementById('section-flashcard').classList.remove('hidden');
-                document.getElementById('mode-flashcard').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-            } else if (mode === 'test') {
-                document.getElementById('section-quiz').classList.remove('hidden');
-                document.getElementById('mode-test').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-                generateQuiz();
-            } else if (mode === 'audio') {
-                document.getElementById('section-audio').classList.remove('hidden');
-                document.getElementById('mode-audio').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-                generateAudioQuiz();
-            } else if (mode === 'reverse') {
-                document.getElementById('section-reverse').classList.remove('hidden');
-                document.getElementById('mode-reverse').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-                generateReverseQuiz();
-            } else if (mode === 'list') {
-                document.getElementById('section-list').classList.remove('hidden');
-                document.getElementById('mode-list').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-                renderList();
+            const btnTest = document.getElementById('mode-test');
+            const btnFlash = document.getElementById('mode-flashcard');
+            
+            if (mode === 'test') {
+                btnTest.className = "px-6 py-2 rounded-lg text-sm font-medium bg-[#e11d48] text-white shadow-lg flex items-center gap-2";
+                btnFlash.className = "px-6 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition flex items-center gap-2";
+                alert("Test rejimi tez orada qo'shiladi!");
+            } else {
+                btnFlash.className = "px-6 py-2 rounded-lg text-sm font-medium bg-[#e11d48] text-white shadow-lg flex items-center gap-2";
+                btnTest.className = "px-6 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition flex items-center gap-2";
             }
         }
 
-        // Boshlang'ich ishga tushirish
-        initDailyWord();
+        // Boshlang'ich yuklash
+        window.speechSynthesis.onvoiceschanged = () => {};
         updateCard();
     </script>
 </body>
