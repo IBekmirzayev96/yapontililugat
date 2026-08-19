@@ -41,7 +41,7 @@
 
         <!-- Level & Category Selector -->
         <select id="level-select" onchange="changeCategory()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer">
-            <option value="n5_kanji">JLPT N5 — Kanji</option>
+            <option value="n5_kanji">JLPT N5 — Kanji (Iyerogliflar)</option>
             <option value="n5_vocab">JLPT N5 — Lug'at (Kotoba)</option>
         </select>
 
@@ -50,13 +50,13 @@
             <span id="card-category-label" class="text-xs font-semibold text-rose-400 tracking-widest uppercase">YAPONCHA KANJI</span>
 
             <div class="text-center my-auto flex flex-col items-center gap-3">
-                <div id="kanji-display" class="text-6xl font-extrabold text-white my-2">学</div>
-                <div id="reading-display" class="text-gray-300 text-lg tracking-wide">まな・ぶ / ガク</div>
-                <div id="meaning-display" class="text-base text-emerald-400 font-medium">O'rganmoq, o'qimoq</div>
+                <div id="kanji-display" class="text-6xl font-extrabold text-white my-2">男</div>
+                <div id="reading-display" class="text-gray-300 text-lg tracking-wide">おとこ / ダン, ナン</div>
+                <div id="meaning-display" class="text-base text-emerald-400 font-medium">Erkak, yigit</div>
             </div>
 
-            <button onclick="speakWord()" class="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition mt-4 hover:bg-gray-800/50 px-4 py-2 rounded-lg">
-                <i class="fa-solid fa-volume-high"></i> Eshitish
+            <button onclick="speakWord()" class="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition mt-4 hover:bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700/50">
+                <i class="fa-solid fa-volume-high text-rose-500"></i> Eshitish
             </button>
         </div>
 
@@ -66,7 +66,7 @@
                 <i class="fa-solid fa-chevron-left"></i> Oldingisi
             </button>
             <div class="text-gray-400 text-sm font-medium tracking-wider">
-                <span id="current-index" class="text-white">1</span> / <span id="total-cards">10</span>
+                <span id="current-index" class="text-white">1</span> / <span id="total-cards">8</span>
             </div>
             <button onclick="nextCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
                 Keyingisi <i class="fa-solid fa-chevron-right"></i>
@@ -84,28 +84,43 @@
     <script>
         const database = {
             n5_kanji: [
-                { word: '学', reading: 'まな・ぶ / ガク', meaning: "O'rganmoq, o'qimoq" },
-                { word: '日', reading: 'ひ / ニチ', meaning: 'Quyosh, Kun' },
-                { word: '本', reading: 'もと / ホン', meaning: 'Kitob, Asos' },
-                { word: '人', reading: 'ひと / ジン', meaning: 'Odam, Inson' },
-                { word: '先', reading: 'さき / セン', meaning: 'Oldingi, Avvalgi' },
-                { word: '生', reading: 'い・きる / セイ', meaning: 'Yashamoq, Hayot' },
-                { word: '校', reading: 'コウ', meaning: 'Maktab' },
-                { word: '語', reading: 'かた・る / ゴ', meaning: 'Til, Soz' },
-                { word: '大', reading: 'おお・きい / ダイ', meaning: 'Katta' },
-                { word: '小', reading: 'ちい・さい / ショウ', meaning: 'Kichik' }
+                { word: '男', reading: 'おとこ / ダン, ナン', meaning: "Erkak, yigit, odam" },
+                { word: '林', reading: 'はやし / リン', meaning: "Yog'och, kichik o'rmon" },
+                { word: '森', reading: 'もり / シン', meaning: "O'rmon, changalzor" },
+                { word: '休', reading: 'やす・む / キュウ', meaning: "Dam olish, bayram" },
+                { word: '体', reading: 'からだ / タイ', meaning: "Tana, jismoniy holat" },
+                { word: '住', reading: 'す・む / ジュウ', meaning: "Yashamoq, manzil, uy-joy" },
+                { word: '明', reading: 'あか・るい / メイ, ミョウ', meaning: "Yorqin, yorug', aniq, ertaga" },
+                { word: '字', reading: 'あざ / ジ', meaning: "Harf, belgi, iyeroglif" }
             ],
             n5_vocab: [
-                { word: 'わたし', reading: '私 (watashi)', meaning: 'Men' },
-                { word: 'あなた', reading: 'Anata', meaning: 'Siz' },
-                { word: 'せんせい', reading: '先生 (sensei)', meaning: 'O\'qituvchi' },
-                { word: 'がくせい', reading: '学生 (gakusei)', meaning: 'Talaba, O\'quvchi' },
-                { word: 'はい', reading: 'Hai', meaning: 'Ha' },
-                { word: 'いいえ', reading: 'Iie', meaning: 'Yo\'q' },
-                { word: 'おはよう', reading: 'Ohayou', meaning: 'Xayrli tong' },
-                { word: 'ありがとう', reading: 'Arigatou', meaning: 'Rahmat' },
-                { word: 'たべる', reading: '食べる (taberu)', meaning: 'Yemoq' },
-                { word: 'のむ', reading: '飲む (nomu)', meaning: 'Ichmoq' }
+                { word: '結婚します', reading: 'けっこんします', meaning: "Uylanmoq, turmush qurmoq" },
+                { word: '欲しい', reading: 'ほしい', meaning: "Xohlamoq" },
+                { word: '経済', reading: 'けいざい', meaning: "Iqtisod" },
+                { word: '電子レンジ', reading: 'でんしれんじ', meaning: "Mikroto'lqinli pech" },
+                { word: '生け花', reading: 'いけばな', meaning: "Ikebana, gul aranjirovkasi" },
+                { word: '天気', reading: 'てんき', meaning: "Ob-havo" },
+                { word: 'お腹がすきました', reading: 'おなかがあきました', meaning: "Qornim ochdi" },
+                { word: 'お腹がいっぱいです', reading: 'おなかがいっぱいです', meaning: "Qornim to'q" },
+                { word: '何か', reading: 'なにか', meaning: "Nimadir" },
+                { word: 'どこか', reading: 'どこか', meaning: "Qayerdadir" },
+                { word: 'ゲームをします', reading: 'げーむをします', meaning: "O'yin o'ynamoq" },
+                { word: '〜のとき', reading: '〜のとき', meaning: "〜ning payti" },
+                { word: '疲れます', reading: 'つかれます', meaning: "Charchamoq" },
+                { word: '疲れました', reading: 'つかれました', meaning: "Charchadim" },
+                { word: '寂しい', reading: 'さびしい', meaning: "Sog'inish, yolg'izlanish" },
+                { word: '広い', reading: 'ひろい', meaning: "Keng" },
+                { word: '狭い', reading: 'せまい', meaning: "Tor" },
+                { word: 'アルバイト', reading: 'あるばいと', meaning: "Soatbay ish (Part-time)" },
+                { word: '歌舞伎', reading: 'かぶき', meaning: "Kabuki (Yapon teatri)" },
+                { word: '晴れ', reading: 'はれ', meaning: "Ochiq-havo" },
+                { word: '雨', reading: 'あめ', meaning: "Yomg'ir" },
+                { word: '曇り', reading: 'くもり', meaning: "Bulutli" },
+                { word: '雪', reading: 'ゆき', meaning: "Qor" },
+                { word: 'お祭り', reading: 'おまつり', meaning: "Festival, marosim" },
+                { word: 'でも', reading: 'でも', meaning: "Ammo, lekin" },
+                { word: '初めて', reading: 'はじめて', meaning: "Birinchi marta" },
+                { word: '特に', reading: 'とくに', meaning: "Ayniqsa" }
             ]
         };
 
@@ -149,8 +164,18 @@
 
         function speakWord() {
             const card = database[currentCategory][currentIndex];
+            window.speechSynthesis.cancel(); // Avvalgi audioni to'xtatish
+
             const utterance = new SpeechSynthesisUtterance(card.word);
             utterance.lang = 'ja-JP';
+            utterance.rate = 0.8;
+
+            const voices = window.speechSynthesis.getVoices();
+            const jaVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
+            if (jaVoice) {
+                utterance.voice = jaVoice;
+            }
+
             window.speechSynthesis.speak(utterance);
         }
 
@@ -169,6 +194,7 @@
         }
 
         // Boshlang'ich yuklash
+        window.speechSynthesis.onvoiceschanged = () => {};
         updateCard();
     </script>
 </body>
