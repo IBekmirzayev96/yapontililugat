@@ -1,201 +1,335 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yapon Tili Viktorina</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yapon Tili va Kanji O'quv Portali</title>
+
+  <!-- CSS USLUBLAR -->
+  <style>
+    /* Asosiy uslublar */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Dark mode (Tungi rejim) */
+    body.dark-mode {
+      background-color: #1e1e1e;
+      color: #f1f1f1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background-color: #2c3e50;
+      color: white;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .theme-btn {
+      padding: 8px 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 20px;
+      background: #ecf0f1;
+      color: #2c3e50;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    body.dark-mode .theme-btn {
+      background: #34495e;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border: 1px solid #e0e0e0;
+    }
+
+    body.dark-mode .card {
+      background: #2d2d2d;
+      border-color: #444;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+
+    body.dark-mode .input-field {
+      background: #3c3c3c;
+      color: #fff;
+      border-color: #555;
+    }
+
+    .data-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .data-list li {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    body.dark-mode .data-list li {
+      border-bottom-color: #444;
+    }
+
+    /* Test uslublari */
+    .quiz-question {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      padding: 10px;
+      border: 1px solid #16a085;
+      background-color: #e8f8f5;
+      color: #16a085;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    .option-btn:hover {
+      background-color: #16a085;
+      color: white;
+    }
+
+    .option-btn.correct {
+      background-color: #2ecc71 !important;
+      color: white !important;
+      border-color: #27ae60;
+    }
+
+    .option-btn.wrong {
+      background-color: #e74c3c !important;
+      color: white !important;
+      border-color: #c0392b;
+    }
+
+    .quiz-btn, .submit-btn {
+      padding: 10px 20px;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 15px;
+    }
+
+    .quiz-result {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
-<body class="bg-[#0f172a] text-white font-sans min-h-screen flex flex-col justify-between p-4">
+<body>
 
-    <!-- Header -->
-    <header class="max-w-4xl mx-auto w-full flex justify-between items-center py-4 border-b border-gray-800">
-        <div class="flex items-center gap-3">
-            <div class="bg-[#e11d48] text-white px-3 py-1.5 rounded-lg text-sm font-bold tracking-wider">
-                日本語
-            </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-wide">Yapon Tili Viktorina</h1>
-                <p class="text-xs text-gray-400">N5 Kanji & Lug'at mashq dasturi</p>
-            </div>
-        </div>
-        <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-amber-400 font-semibold">
-            <i class="fa-solid fa-[#f59e0b] fa-fire"></i>
-            <span id="streak">0</span> <span class="text-gray-400 text-xs font-normal">Ketma-ket</span>
-        </div>
-    </header>
+  <!-- Yuqori panel va Tungi rejim -->
+  <header class="header">
+    <h1>Yapon Tili O'quv Portali</h1>
+    <button id="theme-toggle" class="theme-btn">🌙 Tungi rejim</button>
+  </header>
 
-    <!-- Main Content -->
-    <main class="max-w-2xl mx-auto w-full flex-1 flex flex-col items-center justify-center my-6 gap-6">
-        
-        <!-- Mode Switcher -->
-        <div class="bg-[#1e293b] p-1.5 rounded-xl flex gap-2 border border-gray-700/50 w-fit">
-            <button id="mode-test" onclick="switchMode('test')" class="px-6 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition flex items-center gap-2">
-                <i class="fa-solid fa-graduation-cap"></i> Test Rejimi
-            </button>
-            <button id="mode-flashcard" onclick="switchMode('flashcard')" class="px-6 py-2 rounded-lg text-sm font-medium bg-[#e11d48] text-white shadow-lg flex items-center gap-2">
-                <i class="fa-solid fa-clone"></i> Flashcard
-            </button>
-        </div>
+  <main class="container">
 
-        <!-- Level & Category Selector -->
-        <select id="level-select" onchange="changeCategory()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer">
-            <option value="n5_kanji">JLPT N5 — Kanji (Iyerogliflar)</option>
-            <option value="n5_vocab">JLPT N5 — Lug'at (Kotoba)</option>
-        </select>
+    <!-- 1. Qidiruv paneli -->
+    <section class="card">
+      <h2>🔍 Mavzular bo'yicha qidiruv</h2>
+      <input type="text" id="search-input" placeholder="Mavzuni izlang (masalan: Kanji, Grammatika)..." class="input-field">
+      <ul id="content-list" class="data-list">
+        <li>Kanji darslari (体, 住, 明, 字)</li>
+        <li>Minna no Nihongo lug'at to'plami</li>
+        <li>Grammatika qoidalari va mashqlar</li>
+        <li>Yapon tili N3/N4 imtihoniga tayyorgarlik</li>
+      </ul>
+    </section>
 
-        <!-- Flashcard Box -->
-        <div class="bg-[#1e293b]/70 border border-gray-700/80 rounded-2xl p-10 w-full flex flex-col items-center justify-between min-h-[320px] shadow-2xl relative backdrop-blur-sm">
-            <span id="card-category-label" class="text-xs font-semibold text-rose-400 tracking-widest uppercase">YAPONCHA KANJI</span>
+    <!-- 2. Kanji Test / Viktorina -->
+    <section class="card">
+      <h2>📝 Kanji Bilimini Sinash Testi</h2>
+      <div id="quiz-box">
+        <div id="question" class="quiz-question">Savol yuklanmoqda...</div>
+        <div id="options" class="quiz-options"></div>
+        <div id="result-message" class="quiz-result"></div>
+        <button id="next-btn" class="quiz-btn" style="display: none;">Keyingi savol ➔</button>
+      </div>
+    </section>
 
-            <div class="text-center my-auto flex flex-col items-center gap-3">
-                <div id="kanji-display" class="text-6xl font-extrabold text-white my-2">男</div>
-                <div id="reading-display" class="text-gray-300 text-lg tracking-wide">おとこ / ダン, ナン</div>
-                <div id="meaning-display" class="text-base text-emerald-400 font-medium">Erkak, yigit</div>
-            </div>
+    <!-- 3. Aks-aloqa formasi -->
+    <section class="card">
+      <h2>📬 Biz bilan bog'lanish</h2>
+      <form id="contact-form" class="contact-form">
+        <input type="text" placeholder="Ismingiz" class="input-field" required>
+        <input type="email" placeholder="Email manzilingiz" class="input-field" required>
+        <textarea placeholder="Xabaringizni yozing..." rows="4" class="input-field" required></textarea>
+        <button type="submit" class="submit-btn">Yuborish</button>
+      </form>
+    </section>
 
-            <button onclick="speakWord()" class="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition mt-4 hover:bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700/50">
-                <i class="fa-solid fa-volume-high text-rose-500"></i> Eshitish
-            </button>
-        </div>
+  </main>
 
-        <!-- Controls -->
-        <div class="flex items-center justify-between w-full gap-4">
-            <button onclick="prevCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
-                <i class="fa-solid fa-chevron-left"></i> Oldingisi
-            </button>
-            <div class="text-gray-400 text-sm font-medium tracking-wider">
-                <span id="current-index" class="text-white">1</span> / <span id="total-cards">8</span>
-            </div>
-            <button onclick="nextCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-6 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
-                Keyingisi <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        </div>
+  <!-- JAVASCRIPT KODLARI -->
+  <script>
+    // 1. Dark/Light Mode (Tungi/Kungi rejim)
+    const themeToggleBtn = document.getElementById('theme-toggle');
 
-    </main>
+    themeToggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      if (document.body.classList.contains('dark-mode')) {
+        themeToggleBtn.textContent = '☀️ Kungi rejim';
+      } else {
+        themeToggleBtn.textContent = '🌙 Tungi rejim';
+      }
+    });
 
-    <!-- Footer -->
-    <footer class="text-center text-xs text-gray-500 py-4 border-t border-gray-800/50">
-        Yapon tili o'rganish uchun interaktiv platforma • JLPT N5
-    </footer>
+    // 2. Qidiruv paneli
+    const searchInput = document.getElementById('search-input');
+    const items = document.querySelectorAll('#content-list li');
 
-    <!-- JavaScript Mantiqi -->
-    <script>
-        const database = {
-            n5_kanji: [
-                { word: '男', reading: 'おとこ / ダン, ナン', meaning: "Erkak, yigit, odam" },
-                { word: '林', reading: 'はやし / リン', meaning: "Yog'och, kichik o'rmon" },
-                { word: '森', reading: 'もり / シン', meaning: "O'rmon, changalzor" },
-                { word: '休', reading: 'やす・む / キュウ', meaning: "Dam olish, bayram" },
-                { word: '体', reading: 'からだ / タイ', meaning: "Tana, jismoniy holat" },
-                { word: '住', reading: 'す・む / ジュウ', meaning: "Yashamoq, manzil, uy-joy" },
-                { word: '明', reading: 'あか・るい / メイ, ミョウ', meaning: "Yorqin, yorug', aniq, ertaga" },
-                { word: '字', reading: 'あざ / ジ', meaning: "Harf, belgi, iyeroglif" }
-            ],
-            n5_vocab: [
-                { word: '結婚します', reading: 'けっこんします', meaning: "Uylanmoq, turmush qurmoq" },
-                { word: '欲しい', reading: 'ほしい', meaning: "Xohlamoq" },
-                { word: '経済', reading: 'けいざい', meaning: "Iqtisod" },
-                { word: '電子レンジ', reading: 'でんしれんじ', meaning: "Mikroto'lqinli pech" },
-                { word: '生け花', reading: 'いけばな', meaning: "Ikebana, gul aranjirovkasi" },
-                { word: '天気', reading: 'てんき', meaning: "Ob-havo" },
-                { word: 'お腹がすきました', reading: 'おなかがあきました', meaning: "Qornim ochdi" },
-                { word: 'お腹がいっぱいです', reading: 'おなかがいっぱいです', meaning: "Qornim to'q" },
-                { word: '何か', reading: 'なにか', meaning: "Nimadir" },
-                { word: 'どこか', reading: 'どこか', meaning: "Qayerdadir" },
-                { word: 'ゲームをします', reading: 'げーむをします', meaning: "O'yin o'ynamoq" },
-                { word: '〜のとき', reading: '〜のとき', meaning: "〜ning payti" },
-                { word: '疲れます', reading: 'つかれます', meaning: "Charchamoq" },
-                { word: '疲れました', reading: 'つかれました', meaning: "Charchadim" },
-                { word: '寂しい', reading: 'さびしい', meaning: "Sog'inish, yolg'izlanish" },
-                { word: '広い', reading: 'ひろい', meaning: "Keng" },
-                { word: '狭い', reading: 'せまい', meaning: "Tor" },
-                { word: 'アルバイト', reading: 'あるばいと', meaning: "Soatbay ish (Part-time)" },
-                { word: '歌舞伎', reading: 'かぶき', meaning: "Kabuki (Yapon teatri)" },
-                { word: '晴れ', reading: 'はれ', meaning: "Ochiq-havo" },
-                { word: '雨', reading: 'あめ', meaning: "Yomg'ir" },
-                { word: '曇り', reading: 'くもり', meaning: "Bulutli" },
-                { word: '雪', reading: 'ゆき', meaning: "Qor" },
-                { word: 'お祭り', reading: 'おまつり', meaning: "Festival, marosim" },
-                { word: 'でも', reading: 'でも', meaning: "Ammo, lekin" },
-                { word: '初めて', reading: 'はじめて', meaning: "Birinchi marta" },
-                { word: '特に', reading: 'とくに', meaning: "Ayniqsa" }
-            ]
-        };
+    searchInput.addEventListener('input', (e) => {
+      const filterText = e.target.value.toLowerCase();
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(filterText) ? '' : 'none';
+      });
+    });
 
-        let currentCategory = 'n5_kanji';
-        let currentIndex = 0;
+    // 3. Kanji Testi
+    const quizData = [
+      {
+        question: "「体」 kanjisining ma'nosi nima?",
+        options: ["yashamoq", "tana, badan", "yorqin", "harf"],
+        correct: 1
+      },
+      {
+        question: "「明日」 (あした) so'zi nimani anglatadi?",
+        options: ["bugun", "kecha", "ertaga", "indin"],
+        correct: 2
+      },
+      {
+        question: "「住む」 (すむ) fe'lining ma'nosi nima?",
+        options: ["yashamoq", "o'qimoq", "yozmoq", "ishlamoq"],
+        correct: 0
+      },
+      {
+        question: "「漢字」 so'zining o'qilishi qanday?",
+        options: ["Kanji", "Hiragana", "Katakana", "Romaji"],
+        correct: 0
+      }
+    ];
 
-        function updateCard() {
-            const cardsData = database[currentCategory];
-            const card = cardsData[currentIndex];
-            
-            document.getElementById('kanji-display').innerText = card.word;
-            document.getElementById('reading-display').innerText = card.reading;
-            document.getElementById('meaning-display').innerText = card.meaning;
-            document.getElementById('current-index').innerText = currentIndex + 1;
-            document.getElementById('total-cards').innerText = cardsData.length;
-            
-            document.getElementById('card-category-label').innerText = 
-                currentCategory === 'n5_kanji' ? 'YAPONCHA KANJI (N5)' : 'YAPONCHA LUG\'AT (N5)';
-        }
+    let currentQuestion = 0;
+    let score = 0;
 
-        function changeCategory() {
-            currentCategory = document.getElementById('level-select').value;
-            currentIndex = 0;
-            updateCard();
-        }
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const resultEl = document.getElementById("result-message");
 
-        function nextCard() {
-            const cardsData = database[currentCategory];
-            if (currentIndex < cardsData.length - 1) {
-                currentIndex++;
-                updateCard();
-            }
-        }
+    function loadQuiz() {
+      resetState();
+      const currentQuiz = quizData[currentQuestion];
+      questionEl.textContent = `${currentQuestion + 1}. ${currentQuiz.question}`;
 
-        function prevCard() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateCard();
-            }
-        }
+      currentQuiz.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.classList.add("option-btn");
+        button.addEventListener("click", () => selectOption(button, index, currentQuiz.correct));
+        optionsEl.appendChild(button);
+      });
+    }
 
-        function speakWord() {
-            const card = database[currentCategory][currentIndex];
-            window.speechSynthesis.cancel(); // Avvalgi audioni to'xtatish
+    function resetState() {
+      nextBtn.style.display = "none";
+      resultEl.textContent = "";
+      optionsEl.innerHTML = "";
+    }
 
-            const utterance = new SpeechSynthesisUtterance(card.word);
-            utterance.lang = 'ja-JP';
-            utterance.rate = 0.8;
+    function selectOption(button, selected, correct) {
+      const allButtons = optionsEl.querySelectorAll(".option-btn");
+      allButtons.forEach(btn => btn.disabled = true);
 
-            const voices = window.speechSynthesis.getVoices();
-            const jaVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JP'));
-            if (jaVoice) {
-                utterance.voice = jaVoice;
-            }
+      if (selected === correct) {
+        button.classList.add("correct");
+        resultEl.textContent = "To'g'ri javob! ✨";
+        resultEl.style.color = "#2ecc71";
+        score++;
+      } else {
+        button.classList.add("wrong");
+        allButtons[correct].classList.add("correct");
+        resultEl.textContent = "Noto'g'ri javob! ❌";
+        resultEl.style.color = "#e74c3c";
+      }
 
-            window.speechSynthesis.speak(utterance);
-        }
+      nextBtn.style.display = "block";
+    }
 
-        function switchMode(mode) {
-            const btnTest = document.getElementById('mode-test');
-            const btnFlash = document.getElementById('mode-flashcard');
-            
-            if (mode === 'test') {
-                btnTest.className = "px-6 py-2 rounded-lg text-sm font-medium bg-[#e11d48] text-white shadow-lg flex items-center gap-2";
-                btnFlash.className = "px-6 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition flex items-center gap-2";
-                alert("Test rejimi tez orada qo'shiladi!");
-            } else {
-                btnFlash.className = "px-6 py-2 rounded-lg text-sm font-medium bg-[#e11d48] text-white shadow-lg flex items-center gap-2";
-                btnTest.className = "px-6 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition flex items-center gap-2";
-            }
-        }
+    nextBtn.addEventListener("click", () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuiz();
+      } else {
+        showFinalResult();
+      }
+    });
 
-        // Boshlang'ich yuklash
-        window.speechSynthesis.onvoiceschanged = () => {};
-        updateCard();
-    </script>
+    function showFinalResult() {
+      resetState();
+      questionEl.textContent = "Test yakunlandi! 🎉";
+      resultEl.textContent = `Siz ${quizData.length} ta savoldan ${score} tasiga to'g'ri javob berdingiz.`;
+      resultEl.style.color = "#2c3e50";
+    }
+
+    loadQuiz();
+
+    // 4. Contact Form
+    document.getElementById('contact-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert("Xabaringiz muvaffaqiyatli yuborildi!");
+      e.target.reset();
+    });
+  </script>
 </body>
 </html>
