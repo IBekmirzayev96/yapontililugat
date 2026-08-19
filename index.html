@@ -23,7 +23,7 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold tracking-wide">Yapon Tili Platformasi</h1>
-                <p class="text-xs text-gray-400">N5 Kanji & Lug'at mashq dasturi</p>
+                <p class="text-xs text-gray-400">N5 Kanji, Lug'at & Grammatika mashq dasturi</p>
             </div>
         </div>
         <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-amber-400 font-semibold">
@@ -47,20 +47,23 @@
 
         <!-- Mode Switcher -->
         <div class="bg-[#1e293b] p-1.5 rounded-xl flex gap-1.5 border border-gray-700/50 w-full overflow-x-auto justify-start md:justify-center">
-            <button id="mode-flashcard" onclick="switchMode('flashcard')" class="px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-flashcard" onclick="switchMode(event, 'flashcard')" class="px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-clone"></i> Flashcard
             </button>
-            <button id="mode-test" onclick="switchMode('test')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-grammar" onclick="switchMode(event, 'grammar')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fa-solid fa-book-bookmark"></i> Grammatika
+            </button>
+            <button type="button" id="mode-test" onclick="switchMode(event, 'test')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-graduation-cap"></i> Test
             </button>
-            <button id="mode-audio" onclick="switchMode('audio')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-audio" onclick="switchMode(event, 'audio')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-headphones"></i> Audio-Test
             </button>
-            <button id="mode-reverse" onclick="switchMode('reverse')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-reverse" onclick="switchMode(event, 'reverse')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-language"></i> UZ → JP
             </button>
-            <button id="mode-list" onclick="switchMode('list')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                <i class="fa-solid fa-list-check"></i> Qidiruv / Lug'at
+            <button type="button" id="mode-list" onclick="switchMode(event, 'list')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fa-solid fa-list-check"></i> Qidiruv
             </button>
         </div>
 
@@ -88,13 +91,13 @@
             </div>
 
             <div class="flex items-center justify-between w-full gap-4">
-                <button onclick="prevCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
+                <button type="button" onclick="prevCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
                     <i class="fa-solid fa-chevron-left"></i> Oldingisi
                 </button>
-                <button onclick="speakWord()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition text-rose-400">
+                <button type="button" onclick="speakWord()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition text-rose-400">
                     <i class="fa-solid fa-volume-high"></i> Eshitish
                 </button>
-                <button onclick="nextCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
+                <button type="button" onclick="nextCard()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/3 justify-center">
                     Keyingisi <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
@@ -103,7 +106,47 @@
             </div>
         </div>
 
-        <!-- 2. TEST SECTION -->
+        <!-- 2. GRAMMAR CARDS SECTION -->
+        <div id="section-grammar" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center gap-4">
+            <div class="w-full flex justify-between items-center border-b border-gray-700/50 pb-3">
+                <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase">JLPT N5 GRAMMATIKA</span>
+                <span class="text-xs text-gray-400"><span id="grammar-index" class="text-white">1</span> / <span id="grammar-total">5</span></span>
+            </div>
+            
+            <div class="w-full text-center my-2">
+                <h3 id="grammar-title" class="text-2xl font-bold text-amber-400 mb-1">〜たいです (Taidesu)</h3>
+                <p id="grammar-formula" class="text-xs font-mono bg-[#0f172a] px-3 py-1.5 rounded-lg text-rose-300 inline-block border border-gray-800">Fe'l (Mas-form) + たいです</p>
+            </div>
+
+            <div class="w-full bg-[#0f172a] p-4 rounded-xl border border-gray-800 text-sm text-gray-300 leading-relaxed" id="grammar-explanation">
+                Biror harakatni bajarish istagini (xohlayman) bildiradi. Faqat birinchi va ikkinchi shaxs uchun ishlatiladi.
+            </div>
+
+            <div class="w-full bg-slate-900/60 p-4 rounded-xl border border-rose-500/20 flex flex-col gap-2">
+                <span class="text-[10px] font-bold text-emerald-400 tracking-wider uppercase">NAMUNA JUMLA</span>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div id="grammar-example-jp" class="text-base font-bold text-white">日本へ行きたいです。</div>
+                        <div id="grammar-example-reading" class="text-xs text-gray-400">Nihon e ikitaidesu.</div>
+                        <div id="grammar-example-uz" class="text-sm text-emerald-300 mt-1">Yaponiyaga borishni xohlayman.</div>
+                    </div>
+                    <button type="button" onclick="speakGrammarExample()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-rose-400">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between w-full gap-4 mt-2">
+                <button type="button" onclick="prevGrammar()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/2 justify-center">
+                    <i class="fa-solid fa-chevron-left"></i> Oldingisi
+                </button>
+                <button type="button" onclick="nextGrammar()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/2 justify-center">
+                    Keyingisi <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. TEST SECTION -->
         <div id="section-quiz" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">STANDART TEST</span>
             <div id="quiz-question" class="text-5xl font-extrabold text-white my-3">男</div>
@@ -111,17 +154,17 @@
             <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
         </div>
 
-        <!-- 3. AUDIO-TEST SECTION -->
+        <!-- 4. AUDIO-TEST SECTION -->
         <div id="section-audio" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">AUDIO TEST</span>
             <p class="text-xs text-gray-400 mb-4">So'zni eshiting va to'g'ri javobni toping:</p>
-            <button onclick="playAudioQuestion()" class="bg-rose-600 hover:bg-rose-500 text-white p-5 rounded-full my-2 shadow-lg transition">
+            <button type="button" onclick="playAudioQuestion()" class="bg-rose-600 hover:bg-rose-500 text-white p-5 rounded-full my-2 shadow-lg transition">
                 <i class="fa-solid fa-volume-high text-2xl"></i>
             </button>
             <div id="audio-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-4"></div>
         </div>
 
-        <!-- 4. REVERSE QUIZ SECTION (UZ -> JP) -->
+        <!-- 5. REVERSE QUIZ SECTION (UZ -> JP) -->
         <div id="section-reverse" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">O'ZBEKCHA → YAPONCHA TEST</span>
             <div id="reverse-question" class="text-2xl font-bold text-emerald-400 my-4 text-center">Erkak, yigit</div>
@@ -129,14 +172,14 @@
             <div id="reverse-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
         </div>
 
-        <!-- 5. QIDIRUV VA LUG'AT SECTION -->
+        <!-- 6. QIDIRUV VA LUG'AT SECTION -->
         <div id="section-list" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col gap-4">
             <div class="flex gap-2">
                 <div class="relative flex-1">
                     <input type="text" id="search-input" onkeyup="filterList()" placeholder="So'z, kanji yoki tarjimani qidiring..." class="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500">
                     <i class="fa-solid fa-magnifying-glass absolute right-4 top-3 text-gray-500 text-sm"></i>
                 </div>
-                <button onclick="toggleMistakesFilter()" id="btn-mistakes-filter" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-2.5 rounded-xl text-xs font-semibold text-amber-400 flex items-center gap-1.5 whitespace-nowrap">
+                <button type="button" onclick="toggleMistakesFilter()" id="btn-mistakes-filter" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-2.5 rounded-xl text-xs font-semibold text-amber-400 flex items-center gap-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-triangle-exclamation"></i> Xatolar (<span id="mistake-count">0</span>)
                 </button>
             </div>
@@ -191,11 +234,54 @@
                 { word: 'でも', reading: 'でも', meaning: "Ammo, lekin" },
                 { word: '初めて', reading: 'はじめて', meaning: "Birinchi marta" },
                 { word: '特に', reading: 'とくに', meaning: "Ayniqsa" }
+            ],
+            grammar: [
+                {
+                    title: '〜たいです (Taidesu)',
+                    formula: 'Fe\'l (Mas-o\'zagi) + たいです',
+                    explanation: 'Biror harakatni bajarish istagini (xohlayman) bildiradi. Odatda so\'zlovchining o\'zi uchun ishlatiladi.',
+                    example_jp: '日本へ行きたいです。',
+                    example_reading: 'Nihon e ikitaidesu.',
+                    example_uz: 'Yaponiyaga borishni xohlayman.'
+                },
+                {
+                    title: '〜てください (Te kudasai)',
+                    formula: 'Fe\'l (Te-shakli) + ください',
+                    explanation: 'Iltimos, buyruq yoki taklifni bildirish uchun ishlatiladi (iltimos, biling/bajarib bering).',
+                    example_jp: 'ここに名前を書いてください。',
+                    example_reading: 'Koko ni namae o kaite kudasai.',
+                    example_uz: 'Iltimos, bu yerga ismingizni yozing.'
+                },
+                {
+                    title: '〜ないでください (Naide kudasai)',
+                    formula: 'Fe\'l (Nai-shakli) + でください',
+                    explanation: 'Biror harakatni bajarmaslikni iltimos qilish yoki taqiqlash uchun ishlatiladi.',
+                    example_jp: '写真を撮らないでください。',
+                    example_reading: 'Shashin o toranaide kudasai.',
+                    example_uz: 'Iltimos, rasmga olmang.'
+                },
+                {
+                    title: '〜たことがあります (Ta koto ga arimasu)',
+                    formula: 'Fe\'l (Ta-shakli) + ことがあります',
+                    explanation: 'O\'tmishdagi tajribani (ilgari biror ishni qilganlikni) bildiradi.',
+                    example_jp: '富士山に登ったことがあります。',
+                    example_reading: 'Fujisan ni nobotta koto ga arimasu.',
+                    example_uz: 'Fuji tog\'iga chiqqanman.'
+                },
+                {
+                    title: '〜てもいいです (Te mo ii desu)',
+                    formula: 'Fe\'l (Te-shakli) + もいいです',
+                    explanation: 'Biror harakatni bajarishga ruxsat so\'rash yoki ruxsat berish uchun ishlatiladi.',
+                    example_jp: '写真を撮ってもいいですか。',
+                    example_reading: 'Shashin o totte mo ii desu ka.',
+                    example_uz: 'Rasmga olsam bo\'ladimi?'
+                }
             ]
         };
 
         let currentCategory = 'n5_kanji';
         let currentIndex = 0;
+        let currentGrammarIndex = 0;
         let isFlipped = false;
         let score = 0;
         let mistakes = [];
@@ -223,6 +309,37 @@
             
             document.getElementById('card-category-label').innerText = 
                 currentCategory === 'n5_kanji' ? 'YAPONCHA KANJI (N5)' : 'YAPONCHA LUG\'AT (N5)';
+        }
+
+        function updateGrammarCard() {
+            const item = database.grammar[currentGrammarIndex];
+            document.getElementById('grammar-title').innerText = item.title;
+            document.getElementById('grammar-formula').innerText = item.formula;
+            document.getElementById('grammar-explanation').innerText = item.explanation;
+            document.getElementById('grammar-example-jp').innerText = item.example_jp;
+            document.getElementById('grammar-example-reading').innerText = item.example_reading;
+            document.getElementById('grammar-example-uz').innerText = item.example_uz;
+            document.getElementById('grammar-index').innerText = currentGrammarIndex + 1;
+            document.getElementById('grammar-total').innerText = database.grammar.length;
+        }
+
+        function nextGrammar() {
+            if (currentGrammarIndex < database.grammar.length - 1) {
+                currentGrammarIndex++;
+                updateGrammarCard();
+            }
+        }
+
+        function prevGrammar() {
+            if (currentGrammarIndex > 0) {
+                currentGrammarIndex--;
+                updateGrammarCard();
+            }
+        }
+
+        function speakGrammarExample() {
+            const text = database.grammar[currentGrammarIndex].example_jp;
+            speakWord(text);
         }
 
         function flipCard() {
@@ -256,13 +373,24 @@
             }
         }
 
+        // Internet orqali (Google Translate TTS) tiniq yaponcha audio o'qish funksiyasi
         function speakWord(text = null) {
-            const card = text || database[currentCategory][currentIndex].word;
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(card);
-            utterance.lang = 'ja-JP';
-            utterance.rate = 0.8;
-            window.speechSynthesis.speak(utterance);
+            const wordToSpeak = text || database[currentCategory][currentIndex].word;
+            
+            // Onlayn audio manbasi
+            const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(wordToSpeak)}&tl=ja&client=tw-ob`;
+            
+            const audio = new Audio(audioUrl);
+            audio.play().catch(() => {
+                // Agar internet o'chiq bo'lsa, brauzer ichki tizimidan foydalanish:
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+                    utterance.lang = 'ja-JP';
+                    utterance.rate = 0.8;
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
         }
 
         function generateQuiz() {
@@ -276,6 +404,7 @@
 
             options.forEach(opt => {
                 const btn = document.createElement('button');
+                btn.type = 'button';
                 btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm transition text-left";
                 btn.innerText = opt.meaning;
                 btn.onclick = () => handleAnswer(opt === correct, btn, correct, generateQuiz);
@@ -293,6 +422,7 @@
 
             options.forEach(opt => {
                 const btn = document.createElement('button');
+                btn.type = 'button';
                 btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm transition text-left";
                 btn.innerText = opt.meaning;
                 btn.onclick = () => handleAnswer(opt === currentAudioQuestion, btn, currentAudioQuestion, generateAudioQuiz);
@@ -315,6 +445,7 @@
 
             options.forEach(opt => {
                 const btn = document.createElement('button');
+                btn.type = 'button';
                 btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3.5 rounded-xl text-base transition text-center font-bold";
                 btn.innerText = `${opt.word} (${opt.reading})`;
                 btn.onclick = () => handleAnswer(opt === correct, btn, correct, generateReverseQuiz);
@@ -390,34 +521,47 @@
             renderList();
         }
 
-        function switchMode(mode) {
-            const sections = ['flashcard', 'quiz', 'audio', 'reverse', 'list'];
+        function switchMode(e, mode) {
+            if (e) e.preventDefault();
+            const sections = ['flashcard', 'grammar', 'quiz', 'audio', 'reverse', 'list'];
             sections.forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
 
-            const buttons = ['flashcard', 'test', 'audio', 'reverse', 'list'];
+            const buttons = ['flashcard', 'grammar', 'test', 'audio', 'reverse', 'list'];
             buttons.forEach(b => {
                 document.getElementById(`mode-${b}`).className = 
                     "px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap";
             });
 
+            const levelSelect = document.getElementById('level-select');
+
             if (mode === 'flashcard') {
                 document.getElementById('section-flashcard').classList.remove('hidden');
                 document.getElementById('mode-flashcard').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+                levelSelect.classList.remove('hidden');
+            } else if (mode === 'grammar') {
+                document.getElementById('section-grammar').classList.remove('hidden');
+                document.getElementById('mode-grammar').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+                levelSelect.classList.add('hidden');
+                updateGrammarCard();
             } else if (mode === 'test') {
                 document.getElementById('section-quiz').classList.remove('hidden');
                 document.getElementById('mode-test').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+                levelSelect.classList.remove('hidden');
                 generateQuiz();
             } else if (mode === 'audio') {
                 document.getElementById('section-audio').classList.remove('hidden');
                 document.getElementById('mode-audio').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+                levelSelect.classList.remove('hidden');
                 generateAudioQuiz();
             } else if (mode === 'reverse') {
                 document.getElementById('section-reverse').classList.remove('hidden');
                 document.getElementById('mode-reverse').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+                levelSelect.classList.remove('hidden');
                 generateReverseQuiz();
             } else if (mode === 'list') {
                 document.getElementById('section-list').classList.remove('hidden');
                 document.getElementById('mode-list').className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+                levelSelect.classList.remove('hidden');
                 renderList();
             }
         }
