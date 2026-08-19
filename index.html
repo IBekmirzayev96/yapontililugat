@@ -17,7 +17,7 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold tracking-wide">Yapon Tili Viktorina</h1>
-                <p class="text-xs text-gray-400">Kanji & Lug'at mashq dasturi</p>
+                <p class="text-xs text-gray-400">N5 Kanji & Lug'at mashq dasturi</p>
             </div>
         </div>
         <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-amber-400 font-semibold">
@@ -39,23 +39,23 @@
             </button>
         </div>
 
-        <!-- Level Selector -->
-        <select id="level-select" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer">
-            <option value="n5">Kanji (JLPT N5)</option>
-            <option value="n4">Kanji (JLPT N4)</option>
+        <!-- Level & Category Selector -->
+        <select id="level-select" onchange="changeCategory()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer">
+            <option value="n5_kanji">JLPT N5 — Kanji</option>
+            <option value="n5_vocab">JLPT N5 — Lug'at (Kotoba)</option>
         </select>
 
         <!-- Flashcard Box -->
         <div class="bg-[#1e293b]/70 border border-gray-700/80 rounded-2xl p-10 w-full flex flex-col items-center justify-between min-h-[320px] shadow-2xl relative backdrop-blur-sm">
-            <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase">YAPONCHA</span>
+            <span id="card-category-label" class="text-xs font-semibold text-rose-400 tracking-widest uppercase">YAPONCHA KANJI</span>
 
             <div class="text-center my-auto flex flex-col items-center gap-3">
-                <div id="kanji-display" class="text-7xl font-extrabold text-white my-2">学</div>
+                <div id="kanji-display" class="text-6xl font-extrabold text-white my-2">学</div>
                 <div id="reading-display" class="text-gray-300 text-lg tracking-wide">まな・ぶ / ガク</div>
-                <div id="meaning-display" class="text-xs text-emerald-400 font-medium hidden">O'rganmoq, O'qimoq</div>
+                <div id="meaning-display" class="text-base text-emerald-400 font-medium">O'rganmoq, o'qimoq</div>
             </div>
 
-            <button onclick="speakKanji()" class="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition mt-4 hover:bg-gray-800/50 px-4 py-2 rounded-lg">
+            <button onclick="speakWord()" class="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition mt-4 hover:bg-gray-800/50 px-4 py-2 rounded-lg">
                 <i class="fa-solid fa-volume-high"></i> Eshitish
             </button>
         </div>
@@ -77,36 +77,63 @@
 
     <!-- Footer -->
     <footer class="text-center text-xs text-gray-500 py-4 border-t border-gray-800/50">
-        Yapon tili o'rganish uchun interaktiv platforma • JLPT N5 / N4
+        Yapon tili o'rganish uchun interaktiv platforma • JLPT N5
     </footer>
 
     <!-- JavaScript Mantiqi -->
     <script>
-        const cardsData = [
-            { kanji: '学', reading: 'まな・ぶ / ガク', meaning: "O'rganmoq, o'qimoq" },
-            { kanji: '日', reading: 'ひ / ニチ', meaning: 'Kuy, Quyosh, Yaponiyaning belgisi' },
-            { kanji: '本', reading: 'もと / ホン', meaning: 'Kitob, Asos' },
-            { kanji: '人', reading: 'ひと / ジン', meaning: 'Odam, Inson' },
-            { kanji: '先', reading: 'さき / セン', meaning: 'Oldingi, Avvalgi' },
-            { kanji: '生', reading: 'い・きる / セイ', meaning: 'Yashamoq, Hayot' },
-            { kanji: '校', reading: 'コウ', meaning: 'Maktab' },
-            { kanji: '語', reading: 'かた・る / ゴ', meaning: 'Til, Soz' },
-            { kanji: '大', reading: 'おお・きい / ダイ', meaning: 'Katta' },
-            { kanji: '小', reading: 'ちい・さい / ショウ', meaning: 'Kichik' }
-        ];
+        const database = {
+            n5_kanji: [
+                { word: '学', reading: 'まな・ぶ / ガク', meaning: "O'rganmoq, o'qimoq" },
+                { word: '日', reading: 'ひ / ニチ', meaning: 'Quyosh, Kun' },
+                { word: '本', reading: 'もと / ホン', meaning: 'Kitob, Asos' },
+                { word: '人', reading: 'ひと / ジン', meaning: 'Odam, Inson' },
+                { word: '先', reading: 'さき / セン', meaning: 'Oldingi, Avvalgi' },
+                { word: '生', reading: 'い・きる / セイ', meaning: 'Yashamoq, Hayot' },
+                { word: '校', reading: 'コウ', meaning: 'Maktab' },
+                { word: '語', reading: 'かた・る / ゴ', meaning: 'Til, Soz' },
+                { word: '大', reading: 'おお・きい / ダイ', meaning: 'Katta' },
+                { word: '小', reading: 'ちい・さい / ショウ', meaning: 'Kichik' }
+            ],
+            n5_vocab: [
+                { word: 'わたし', reading: '私 (watashi)', meaning: 'Men' },
+                { word: 'あなた', reading: 'Anata', meaning: 'Siz' },
+                { word: 'せんせい', reading: '先生 (sensei)', meaning: 'O\'qituvchi' },
+                { word: 'がくせい', reading: '学生 (gakusei)', meaning: 'Talaba, O\'quvchi' },
+                { word: 'はい', reading: 'Hai', meaning: 'Ha' },
+                { word: 'いいえ', reading: 'Iie', meaning: 'Yo\'q' },
+                { word: 'おはよう', reading: 'Ohayou', meaning: 'Xayrli tong' },
+                { word: 'ありがとう', reading: 'Arigatou', meaning: 'Rahmat' },
+                { word: 'たべる', reading: '食べる (taberu)', meaning: 'Yemoq' },
+                { word: 'のむ', reading: '飲む (nomu)', meaning: 'Ichmoq' }
+            ]
+        };
 
+        let currentCategory = 'n5_kanji';
         let currentIndex = 0;
 
         function updateCard() {
+            const cardsData = database[currentCategory];
             const card = cardsData[currentIndex];
-            document.getElementById('kanji-display').innerText = card.kanji;
+            
+            document.getElementById('kanji-display').innerText = card.word;
             document.getElementById('reading-display').innerText = card.reading;
             document.getElementById('meaning-display').innerText = card.meaning;
             document.getElementById('current-index').innerText = currentIndex + 1;
             document.getElementById('total-cards').innerText = cardsData.length;
+            
+            document.getElementById('card-category-label').innerText = 
+                currentCategory === 'n5_kanji' ? 'YAPONCHA KANJI (N5)' : 'YAPONCHA LUG\'AT (N5)';
+        }
+
+        function changeCategory() {
+            currentCategory = document.getElementById('level-select').value;
+            currentIndex = 0;
+            updateCard();
         }
 
         function nextCard() {
+            const cardsData = database[currentCategory];
             if (currentIndex < cardsData.length - 1) {
                 currentIndex++;
                 updateCard();
@@ -120,9 +147,9 @@
             }
         }
 
-        function speakKanji() {
-            const card = cardsData[currentIndex];
-            const utterance = new SpeechSynthesisUtterance(card.kanji);
+        function speakWord() {
+            const card = database[currentCategory][currentIndex];
+            const utterance = new SpeechSynthesisUtterance(card.word);
             utterance.lang = 'ja-JP';
             window.speechSynthesis.speak(utterance);
         }
