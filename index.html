@@ -23,11 +23,11 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold tracking-wide">Yapon Tili Platformasi</h1>
-                <p class="text-xs text-gray-400">N5 Kanji, Lug'at & Grammatika mashq dasturi</p>
+                <p class="text-xs text-gray-400">JLPT N5 Kanji, Lug'at, Grammatika & Dialoglar</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-rose-400 font-semibold" title="Ketma-ket kirilgan kunlar">
+            <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-rose-400 font-semibold">
                 <i class="fa-solid fa-calendar-check text-rose-500"></i>
                 <span id="daily-streak">0</span> <span class="text-gray-400 text-xs font-normal">Kun</span>
             </div>
@@ -53,28 +53,31 @@
 
         <!-- Mode Switcher -->
         <div class="bg-[#1e293b] p-1.5 rounded-xl flex gap-1.5 border border-gray-700/50 w-full overflow-x-auto justify-start md:justify-center">
-            <button type="button" id="mode-flashcard" onclick="switchMode(event, 'flashcard')" class="px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-flashcard" onclick="switchMode('flashcard')" class="px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-clone"></i> Flashcard
             </button>
-            <button type="button" id="mode-grammar" onclick="switchMode(event, 'grammar')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-dialogue" onclick="switchMode('dialogue')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fa-solid fa-[#10b981] fa-comments text-emerald-400"></i> Muloqot
+            </button>
+            <button type="button" id="mode-grammar" onclick="switchMode('grammar')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-book-bookmark"></i> Grammatika
             </button>
-            <button type="button" id="mode-quiz" onclick="switchMode(event, 'quiz')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-quiz" onclick="switchMode('quiz')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-graduation-cap"></i> Test
             </button>
-            <button type="button" id="mode-audio" onclick="switchMode(event, 'audio')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-audio" onclick="switchMode('audio')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-headphones"></i> Audio-Test
             </button>
-            <button type="button" id="mode-reverse" onclick="switchMode(event, 'reverse')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-reverse" onclick="switchMode('reverse')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-language"></i> UZ → JP
             </button>
-            <button type="button" id="mode-speech" onclick="switchMode(event, 'speech')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-speech" onclick="switchMode('speech')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-microphone"></i> Talaffuz
             </button>
-            <button type="button" id="mode-speed" onclick="switchMode(event, 'speed')" class="px-3 py-2 rounded-lg text-xs font-medium text-amber-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-speed" onclick="switchMode('speed')" class="px-3 py-2 rounded-lg text-xs font-medium text-amber-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-stopwatch"></i> Taymer (30s)
             </button>
-            <button type="button" id="mode-list" onclick="switchMode(event, 'list')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+            <button type="button" id="mode-list" onclick="switchMode('list')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-list-check"></i> Qidiruv
             </button>
         </div>
@@ -118,7 +121,36 @@
             </div>
         </div>
 
-        <!-- 2. GRAMMAR CARDS SECTION -->
+        <!-- 2. AUDIO-MULOQOT (DIALOG) SECTION -->
+        <div id="section-dialogue" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center gap-4">
+            <div class="w-full flex justify-between items-center border-b border-gray-700/50 pb-3">
+                <span class="text-xs font-semibold text-emerald-400 tracking-widest uppercase"><i class="fa-solid fa-comments"></i> INTERAKTIV MULOQOT</span>
+                <span class="text-xs text-gray-400"><span id="dialogue-index" class="text-white">1</span> / <span id="dialogue-total">3</span></span>
+            </div>
+
+            <div class="w-full flex items-center justify-between my-1">
+                <div>
+                    <h3 id="dialogue-title" class="text-lg font-bold text-white">Do'konda xarid qilish</h3>
+                    <p id="dialogue-desc" class="text-xs text-gray-400">Kassir va xaridor o'rtasidagi so'zlashuv</p>
+                </div>
+                <button type="button" onclick="playFullDialogue()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition">
+                    <i class="fa-solid fa-play"></i> To'liq eshitish
+                </button>
+            </div>
+
+            <div id="dialogue-lines-container" class="w-full flex flex-col gap-3 my-2 max-h-[320px] overflow-y-auto pr-1"></div>
+
+            <div class="flex items-center justify-between w-full gap-4 mt-2">
+                <button type="button" onclick="prevDialogue()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/2 justify-center">
+                    <i class="fa-solid fa-chevron-left"></i> Oldingi Muloqot
+                </button>
+                <button type="button" onclick="nextDialogue()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/2 justify-center">
+                    Keyingi Muloqot <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. GRAMMAR CARDS SECTION -->
         <div id="section-grammar" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center gap-4">
             <div class="w-full flex justify-between items-center border-b border-gray-700/50 pb-3">
                 <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase">JLPT N5 GRAMMATIKA</span>
@@ -131,7 +163,7 @@
             </div>
 
             <div class="w-full bg-[#0f172a] p-4 rounded-xl border border-gray-800 text-sm text-gray-300 leading-relaxed" id="grammar-explanation">
-                Biror harakatni bajarish istagini (xohlayman) bildiradi.
+                Biror harakatni bajarish istagini bildiradi.
             </div>
 
             <div class="w-full bg-slate-900/60 p-4 rounded-xl border border-rose-500/20 flex flex-col gap-2">
@@ -158,7 +190,7 @@
             </div>
         </div>
 
-        <!-- 3. STANDART TEST SECTION -->
+        <!-- 4. STANDART TEST SECTION -->
         <div id="section-quiz" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">STANDART TEST</span>
             <div id="quiz-question" class="text-5xl font-extrabold text-white my-3">男</div>
@@ -166,7 +198,7 @@
             <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
         </div>
 
-        <!-- 4. AUDIO-TEST SECTION -->
+        <!-- 5. AUDIO-TEST SECTION -->
         <div id="section-audio" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">AUDIO TEST</span>
             <p class="text-xs text-gray-400 mb-4">So'zni eshiting va to'g'ri javobni toping:</p>
@@ -176,7 +208,7 @@
             <div id="audio-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-4"></div>
         </div>
 
-        <!-- 5. REVERSE QUIZ SECTION (UZ -> JP) -->
+        <!-- 6. REVERSE QUIZ SECTION (UZ -> JP) -->
         <div id="section-reverse" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">O'ZBEKCHA → YAPONCHA TEST</span>
             <div id="reverse-question" class="text-2xl font-bold text-emerald-400 my-4 text-center">Erkak, yigit</div>
@@ -184,7 +216,7 @@
             <div id="reverse-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
         </div>
 
-        <!-- 6. TALAFFUZNI TEKSHIRISH SECTION -->
+        <!-- 7. TALAFFUZNI TEKSHIRISH SECTION -->
         <div id="section-speech" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center text-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">TALAFFUZ AMALIYOTI</span>
             <div id="speech-target" class="text-4xl font-extrabold text-white my-2">男</div>
@@ -205,7 +237,7 @@
             </button>
         </div>
 
-        <!-- 7. TAYMERLI SHPORD TEST SECTION (SPEED CHALLENGE) -->
+        <!-- 8. TAYMERLI TEST SECTION -->
         <div id="section-speed" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <div class="w-full flex justify-between items-center mb-2">
                 <span class="text-xs font-semibold text-amber-400 tracking-widest uppercase">TEZKOR TEST</span>
@@ -225,7 +257,7 @@
             </div>
         </div>
 
-        <!-- 8. QIDIRUV VA LUG'AT SECTION -->
+        <!-- 9. QIDIRUV VA LUG'AT SECTION -->
         <div id="section-list" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col gap-4">
             <div class="flex gap-2">
                 <div class="relative flex-1">
@@ -241,22 +273,20 @@
 
     </main>
 
-    <!-- Footer -->
     <footer class="text-center text-xs text-gray-500 py-4 border-t border-gray-800/50">
         Yapon tili o'rganish interaktiv platformasi • JLPT N5
     </footer>
 
-    <!-- JS Mantiqi -->
     <script>
         const database = {
             n5_kanji: [
-                { word: '男', reading: 'おとこ / ダン, ナン', meaning: "Erkak, yigit, odam" },
+                { word: '男', reading: 'おとこ / ダン', meaning: "Erkak, yigit, odam" },
                 { word: '林', reading: 'はやし / リン', meaning: "Yog'och, kichik o'rmon" },
                 { word: '森', reading: 'もり / シン', meaning: "O'rmon, changalzor" },
                 { word: '休', reading: 'やす・む / キュウ', meaning: "Dam olish, bayram" },
                 { word: '体', reading: 'からだ / タイ', meaning: "Tana, jismoniy holat" },
-                { word: '住', reading: 'す・む / ジュウ', meaning: "Yashamoq, manzil, uy-joy" },
-                { word: '明', reading: 'あか・るい / メイ, ミョウ', meaning: "Yorqin, yorug', aniq, ertaga" },
+                { word: '住', reading: 'す・む / ジュウ', meaning: "Yashamoq, manzil" },
+                { word: '明', reading: 'あか・るい / メイ', meaning: "Yorqin, yorug', aniq" },
                 { word: '字', reading: 'あざ / ジ', meaning: "Harf, belgi, iyeroglif" }
             ],
             n5_vocab: [
@@ -264,7 +294,7 @@
                 { word: '欲しい', reading: 'ほしい', meaning: "Xohlamoq" },
                 { word: '経済', reading: 'けいざい', meaning: "Iqtisod" },
                 { word: '電子レンジ', reading: 'でんしれんじ', meaning: "Mikroto'lqinli pech" },
-                { word: '生け花', reading: 'いけばな', meaning: "Ikebana, gul aranjirovkasi" },
+                { word: '生け花', reading: 'いけばな', meaning: "Ikebana" },
                 { word: '天気', reading: 'てんき', meaning: "Ob-havo" },
                 { word: 'お腹がすきました', reading: 'おなかがあきました', meaning: "Qornim ochdi" },
                 { word: 'お腹がいっぱいです', reading: 'おなかがいっぱいです', meaning: "Qornim to'q" },
@@ -277,13 +307,13 @@
                 { word: '寂しい', reading: 'さびしい', meaning: "Sog'inish, yolg'izlanish" },
                 { word: '広い', reading: 'ひろい', meaning: "Keng" },
                 { word: '狭い', reading: 'せまい', meaning: "Tor" },
-                { word: 'アルバイト', reading: 'あるばいと', meaning: "Soatbay ish (Part-time)" },
-                { word: '歌舞伎', reading: 'かぶき', meaning: "Kabuki (Yapon teatri)" },
+                { word: 'アルバイト', reading: 'あるばいと', meaning: "Soatbay ish" },
+                { word: '歌舞伎', reading: 'かぶき', meaning: "Kabuki" },
                 { word: '晴れ', reading: 'はれ', meaning: "Ochiq-havo" },
                 { word: '雨', reading: 'あめ', meaning: "Yomg'ir" },
                 { word: '曇り', reading: 'くもり', meaning: "Bulutli" },
                 { word: '雪', reading: 'ゆき', meaning: "Qor" },
-                { word: 'お祭り', reading: 'おまつり', meaning: "Festival, marosim" },
+                { word: 'お祭り', reading: 'おまつり', meaning: "Festival" },
                 { word: 'でも', reading: 'でも', meaning: "Ammo, lekin" },
                 { word: '初めて', reading: 'はじめて', meaning: "Birinchi marta" },
                 { word: '特に', reading: 'とくに', meaning: "Ayniqsa" }
@@ -292,7 +322,7 @@
                 {
                     title: '〜たいです (Taidesu)',
                     formula: 'Fe\'l (Mas-o\'zagi) + たいです',
-                    explanation: 'Biror harakatni bajarish istagini (xohlayman) bildiradi. Odatda so\'zlovchining o\'zi uchun ishlatiladi.',
+                    explanation: 'Biror harakatni bajarish istagini (xohlayman) bildiradi.',
                     example_jp: '日本へ行きたいです。',
                     example_reading: 'Nihon e ikitaidesu.',
                     example_uz: 'Yaponiyaga borishni xohlayman.'
@@ -308,7 +338,7 @@
                 {
                     title: '〜ないでください (Naide kudasai)',
                     formula: 'Fe\'l (Nai-shakli) + でください',
-                    explanation: 'Biror harakatni bajarmaslikni iltimos qilish yoki taqiqlash uchun ishlatiladi.',
+                    explanation: 'Biror harakatni bajarmaslikni iltimos qilish uchun ishlatiladi.',
                     example_jp: '写真を撮らないでください。',
                     example_reading: 'Shashin o toranaide kudasai.',
                     example_uz: 'Iltimos, rasmga olmang.'
@@ -316,7 +346,7 @@
                 {
                     title: '〜たことがあります (Ta koto ga arimasu)',
                     formula: 'Fe\'l (Ta-shakli) + ことがあります',
-                    explanation: 'O\'tmishdagi tajribani (ilgari biror ishni qilganlikni) bildiradi.',
+                    explanation: 'O\'tmishdagi tajribani bildiradi.',
                     example_jp: '富士山に登ったことがあります。',
                     example_reading: 'Fujisan ni nobotta koto ga arimasu.',
                     example_uz: 'Fuji tog\'iga chiqqanman.'
@@ -324,10 +354,44 @@
                 {
                     title: '〜てもいいです (Te mo ii desu)',
                     formula: 'Fe\'l (Te-shakli) + もいいです',
-                    explanation: 'Biror harakatni bajarishga ruxsat so\'rash yoki ruxsat berish uchun ishlatiladi.',
+                    explanation: 'Ruxsat so\'rash yoki ruxsat berish uchun ishlatiladi.',
                     example_jp: '写真を撮ってもいいですか。',
                     example_reading: 'Shashin o totte mo ii desu ka.',
                     example_uz: 'Rasmga olsam bo\'ladimi?'
+                }
+            ],
+            dialogues: [
+                {
+                    title: "Do'konda xarid qilish",
+                    desc: "Kassir va xaridor o'rtasidagi muloqot",
+                    lines: [
+                        { speaker: "Kassir", jp: "いらっしゃいませ！", reading: "Irasshaimase!", uz: "Xush kelibsiz!" },
+                        { speaker: "Xaridor", jp: "すみません、これはいくらですか。", reading: "Sumimasen, kore wa ikura desu ka.", uz: "Kechirasiz, bu qancha turadi?" },
+                        { speaker: "Kassir", jp: "それは五百円です。", reading: "Sore wa gohyaku-en desu.", uz: "U 500 yen turadi." },
+                        { speaker: "Xaridor", jp: "じゃ、これをください。", reading: "Ja, kore o kudasai.", uz: "Unda, shuni bering." },
+                        { speaker: "Kassir", jp: "ありがとうございます！", reading: "Arigatou gozaimasu!", uz: "Katta rahmat!" }
+                    ]
+                },
+                {
+                    title: "Restoranda ovqat buyurtma qilish",
+                    desc: "Ofitsiant va mijoz suhbati",
+                    lines: [
+                        { speaker: "Ofitsiant", jp: "ご注文はお決まりですか。", reading: "Gochuumon wa okimari desu ka.", uz: "Buyurtmaga tayyormisiz?" },
+                        { speaker: "Mijoz", jp: "ラーメンを一つお願いします。", reading: "Raamen o hitotsu onegaishimasu.", uz: "Bitta ramen bering, iltimos." },
+                        { speaker: "Ofitsiant", jp: "かしこまりました。少々お待ちください。", reading: "Kashikomarimashita. Shou shou omachi kudasai.", uz: "Tushundim. Biroz kuting." },
+                        { speaker: "Mijoz", jp: "はい、ありがとうございます。", reading: "Hai, arigatou gozaimasu.", uz: "Xo'p, rahmat." }
+                    ]
+                },
+                {
+                    title: "Ko'chada yo'l so'rash",
+                    desc: "Sayyoh va mahalliy fuqaro",
+                    lines: [
+                        { speaker: "Sayyoh", jp: "すみません、駅はどこですか。", reading: "Sumimasen, eki wa doko desu ka.", uz: "Kechirasiz, stantsiya qayerda?" },
+                        { speaker: "Fuqaro", jp: "あそこを右に曲がってください。", reading: "Asoko o migi ni magatte kudasai.", uz: "Ana u yerdan o'ngga buring." },
+                        { speaker: "Sayyoh", jp: "まっすぐですか。", reading: "Massugu desu ka.", uz: "To'g'riyami?" },
+                        { speaker: "Fuqaro", jp: "はい、まっすぐ行くと右側にあります。", reading: "Hai, massugu iku to migigawa ni arimasu.", uz: "Ha, to'g'ri borsangiz o'ng tomonda bo'ladi." },
+                        { speaker: "Sayyoh", jp: "どうもありがとうございます！", reading: "Doumo arigatou gozaimasu!", uz: "Katta rahmat!" }
+                    ]
                 }
             ]
         };
@@ -335,6 +399,7 @@
         let currentCategory = 'n5_kanji';
         let currentIndex = 0;
         let currentGrammarIndex = 0;
+        let currentDialogueIndex = 0;
         let isFlipped = false;
         let score = 0;
         let mistakes = [];
@@ -342,12 +407,95 @@
         let currentSpeechTarget = null;
         let showMistakesOnly = false;
 
-        // Speed Challenge variables
         let speedTimer = null;
         let timeLeft = 30;
         let speedScore = 0;
 
-        // Streak tekshiruvi (LocalStorage)
+        function speakWord(text = null) {
+            const wordToSpeak = text || database[currentCategory][currentIndex].word;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+                utterance.lang = 'ja-JP';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Brauzeringizda ovoz chiqaramaydi.");
+            }
+        }
+
+        function speakGrammarExample() {
+            const text = database.grammar[currentGrammarIndex].example_jp;
+            speakWord(text);
+        }
+
+        function renderDialogue() {
+            const item = database.dialogues[currentDialogueIndex];
+            document.getElementById('dialogue-title').innerText = item.title;
+            document.getElementById('dialogue-desc').innerText = item.desc;
+            document.getElementById('dialogue-index').innerText = currentDialogueIndex + 1;
+            document.getElementById('dialogue-total').innerText = database.dialogues.length;
+
+            const container = document.getElementById('dialogue-lines-container');
+            container.innerHTML = '';
+
+            item.lines.forEach((line, idx) => {
+                const isEven = idx % 2 === 0;
+                const lineDiv = document.createElement('div');
+                lineDiv.className = `p-3.5 rounded-xl border flex justify-between items-center gap-3 ${
+                    isEven ? 'bg-[#0f172a] border-gray-800' : 'bg-slate-900/60 border-emerald-500/20'
+                }`;
+
+                lineDiv.innerHTML = `
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">${line.speaker}</span>
+                        <span class="text-sm font-bold text-white">${line.jp}</span>
+                        <span class="text-xs text-gray-400">${line.reading}</span>
+                        <span class="text-xs text-emerald-300 mt-1">${line.uz}</span>
+                    </div>
+                    <button type="button" onclick="speakWord('${line.jp}')" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 p-2.5 rounded-xl text-emerald-400 transition flex-shrink-0">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                `;
+                container.appendChild(lineDiv);
+            });
+        }
+
+        function playFullDialogue() {
+            const lines = database.dialogues[currentDialogueIndex].lines;
+            let lineIdx = 0;
+
+            function playNextLine() {
+                if (lineIdx < lines.length) {
+                    const utterance = new SpeechSynthesisUtterance(lines[lineIdx].jp);
+                    utterance.lang = 'ja-JP';
+                    utterance.rate = 0.85;
+                    utterance.onend = () => {
+                        lineIdx++;
+                        setTimeout(playNextLine, 500);
+                    };
+                    window.speechSynthesis.speak(utterance);
+                }
+            }
+
+            window.speechSynthesis.cancel();
+            playNextLine();
+        }
+
+        function nextDialogue() {
+            if (currentDialogueIndex < database.dialogues.length - 1) {
+                currentDialogueIndex++;
+                renderDialogue();
+            }
+        }
+
+        function prevDialogue() {
+            if (currentDialogueIndex > 0) {
+                currentDialogueIndex--;
+                renderDialogue();
+            }
+        }
+
         function checkDailyStreak() {
             const lastVisit = localStorage.getItem('jp_last_visit');
             let streak = parseInt(localStorage.getItem('jp_streak') || '0');
@@ -356,8 +504,7 @@
             if (lastVisit) {
                 const lastDate = new Date(lastVisit);
                 const currentDate = new Date();
-                const diffTime = Math.abs(currentDate - lastDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffDays = Math.ceil(Math.abs(currentDate - lastDate) / (1000 * 60 * 60 * 24));
 
                 if (diffDays === 1 && lastVisit !== today) {
                     streak += 1;
@@ -457,26 +604,6 @@
             }
         }
 
-        function speakGrammarExample() {
-            speakWord(database.grammar[currentGrammarIndex].example_jp);
-        }
-
-        function speakWord(text = null) {
-            const wordToSpeak = text || database[currentCategory][currentIndex].word;
-            const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(wordToSpeak)}&tl=ja&client=tw-ob`;
-            
-            const audio = new Audio(audioUrl);
-            audio.play().catch(() => {
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(wordToSpeak);
-                    utterance.lang = 'ja-JP';
-                    utterance.rate = 0.8;
-                    window.speechSynthesis.speak(utterance);
-                }
-            });
-        }
-
         function generateQuiz() {
             const list = database[currentCategory];
             const correct = list[Math.floor(Math.random() * list.length)];
@@ -551,7 +678,7 @@
         function startSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert("Brauzeringiz ovoz tanish funksiyasini qo'llab-quvvatlamaydi. Chrome-dan foydalanib ko'ring.");
+                alert("Brauzeringiz ovoz tanish funksiyasini qo'llab-quvvatlamaydi.");
                 return;
             }
 
@@ -571,7 +698,6 @@
             recognition.onresult = function(event) {
                 const spokenText = event.results[0][0].transcript;
                 micBtn.classList.remove('animate-pulse', 'bg-amber-500');
-                
                 resDiv.classList.remove('hidden');
                 
                 if (spokenText.includes(currentSpeechTarget.word) || spokenText.includes(currentSpeechTarget.reading.split('/')[0].trim())) {
@@ -712,14 +838,14 @@
             renderList();
         }
 
-        function switchMode(e, mode) {
-            if (e) e.preventDefault();
+        function switchMode(mode) {
             if (speedTimer) clearInterval(speedTimer);
+            window.speechSynthesis.cancel();
 
-            const sections = ['flashcard', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'speed', 'list'];
+            const sections = ['flashcard', 'dialogue', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'speed', 'list'];
             sections.forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
 
-            const buttons = ['flashcard', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'speed', 'list'];
+            const buttons = ['flashcard', 'dialogue', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'speed', 'list'];
             buttons.forEach(b => {
                 document.getElementById(`mode-${b}`).className = 
                     "px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap";
@@ -730,13 +856,14 @@
             document.getElementById(`section-${mode}`).classList.remove('hidden');
             document.getElementById(`mode-${mode}`).className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
 
-            if (mode === 'grammar') {
+            if (mode === 'grammar' || mode === 'dialogue') {
                 levelSelect.classList.add('hidden');
-                updateGrammarCard();
             } else {
                 levelSelect.classList.remove('hidden');
             }
 
+            if (mode === 'dialogue') renderDialogue();
+            if (mode === 'grammar') updateGrammarCard();
             if (mode === 'quiz') generateQuiz();
             if (mode === 'audio') generateAudioQuiz();
             if (mode === 'reverse') generateReverseQuiz();
