@@ -60,6 +60,9 @@
             <button type="button" id="mode-reverse" onclick="switchMode('reverse')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-language"></i> UZ → JP
             </button>
+            <button type="button" id="mode-ai" onclick="switchMode('ai')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fa-solid fa-robot text-violet-400"></i> AI Ustoz
+            </button>
             <button type="button" id="mode-speech" onclick="switchMode('speech')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-microphone"></i> Talaffuz
             </button>
@@ -239,6 +242,12 @@
         </div>
 
         <!-- QIDIRUV VA LUG'AT -->
+        <div id="section-ai" class="w-full bg-[#1e293b]/80 border border-violet-500/30 rounded-2xl p-4 hidden flex-col gap-4">
+<div class="flex items-center justify-between border-b border-gray-700 pb-3"><div><h2 class="text-lg font-bold text-white">🤖 AI Yapon Tili Ustozi</h2><p class="text-xs text-gray-400">N5/N4 darajasida yaponcha suhbat qiling</p></div><button onclick="finishAiConversation()" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg text-xs font-bold">📊 Baholash</button></div>
+<div id="ai-chat-messages" class="h-[380px] overflow-y-auto flex flex-col gap-3 p-2"></div>
+<div class="flex gap-2"><input id="ai-chat-input" type="text" placeholder="Yaponcha yozing... Masalan: こんにちは" class="flex-1 bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500" onkeydown="if(event.key==='Enter') sendAiMessage()"><button onclick="startAiVoice()" class="bg-rose-600 hover:bg-rose-500 px-4 rounded-xl">🎤</button><button onclick="sendAiMessage()" class="bg-violet-600 hover:bg-violet-500 px-4 rounded-xl">➤</button></div>
+<div id="ai-status" class="text-xs text-gray-400 text-center min-h-[20px]">AI suhbatga tayyor.</div><div id="ai-evaluation" class="hidden bg-[#0f172a] border border-emerald-500/30 rounded-xl p-4"></div></div>
+
         <div id="section-list" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col gap-4">
             <input type="text" id="search-input" onkeyup="filterList()" placeholder="So'z, kanji yoki tarjimani qidiring..." class="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 text-white">
             <div id="words-list" class="max-h-[300px] overflow-y-auto space-y-2 pr-1"></div>
@@ -1426,7 +1435,7 @@
 
         function switchMode(mode) {
             currentMode = mode;
-            const modes = ['flashcard', 'dialogue', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'list'];
+            const modes = ['flashcard', 'dialogue', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'ai', 'list'];
             modes.forEach(m => {
                 const btn = document.getElementById(`mode-${m}`);
                 const sec = document.getElementById(`section-${m}`);
@@ -1457,6 +1466,7 @@
             else if (currentMode === 'audio') renderAudio();
             else if (currentMode === 'reverse') renderReverse();
             else if (currentMode === 'speech') renderSpeech();
+            else if (currentMode === 'ai') renderAiTutor();
             else if (currentMode === 'list') renderList();
         }
 
@@ -1841,6 +1851,15 @@
             score += pts;
             document.getElementById('streak').innerText = score;
         }
+
+        // AI Ustoz
+        let aiConversation = [];
+        function renderAiTutor(){ if(!aiConversation.length){ aiConversation=[{role:'assistant',content:'こんにちは！私はあなたのAI日本語先生です。\n\nN5/N4 darajasida yaponcha suhbat qilamiz. Yaponcha yozing yoki 🎤 tugmasini bosing!'}]; } renderAiMessages(); }
+        function renderAiMessages(){ const c=document.getElementById('ai-chat-messages'); if(!c)return; c.innerHTML=''; aiConversation.forEach(m=>{const d=document.createElement('div'); d.className=m.role==='user'?'ml-auto max-w-[85%] bg-rose-600 rounded-2xl rounded-br-sm px-4 py-3 text-sm whitespace-pre-wrap':'mr-auto max-w-[85%] bg-[#0f172a] border border-gray-700 rounded-2xl rounded-bl-sm px-4 py-3 text-sm whitespace-pre-wrap'; d.innerText=m.content;c.appendChild(d)});c.scrollTop=c.scrollHeight; }
+        async function sendAiMessage(){ const input=document.getElementById('ai-chat-input'); const msg=input.value.trim(); if(!msg)return; aiConversation.push({role:'user',content:msg});input.value='';renderAiMessages();document.getElementById('ai-status').innerText='🤖 AI javob tayyorlamoqda...';try{const r=await fetch('/api/japanese-tutor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:aiConversation})});const d=await r.json();if(!r.ok)throw new Error(d.error);aiConversation.push({role:'assistant',content:d.reply});renderAiMessages();document.getElementById('ai-status').innerText='AI javob berdi.';speakAiReply(d.reply)}catch(e){document.getElementById('ai-status').innerText='AI serverga ulanib bo‘lmadi. Serverni ishga tushiring.';}}
+        function speakAiReply(text){speechSynthesis.cancel();const jp=text.match(/[ぁ-んァ-ン一-龯々ー、。！？\s]+/g)?.join(' ');if(!jp?.trim())return;const u=new SpeechSynthesisUtterance(jp);u.lang='ja-JP';u.rate=.85;speechSynthesis.speak(u)}
+        function startAiVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Brauzer ovoz tanishni qo‘llab-quvvatlamaydi. Chrome ishlating.');return}const r=new SR();r.lang='ja-JP';r.interimResults=false;document.getElementById('ai-status').innerText='🎤 Sizni tinglayapman...';r.onresult=e=>{document.getElementById('ai-chat-input').value=e.results[0][0].transcript;sendAiMessage()};r.onerror=()=>document.getElementById('ai-status').innerText='Mikrofon xatosi. Qayta urinib ko‘ring.';r.start()}
+        async function finishAiConversation(){if(aiConversation.filter(x=>x.role==='user').length<1){alert('Avval AI bilan suhbat qiling.');return}const b=document.getElementById('ai-evaluation');b.classList.remove('hidden');b.innerHTML='📊 Suhbat tahlil qilinmoqda...';try{const r=await fetch('/api/japanese-evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:aiConversation})});const d=await r.json();b.innerHTML=`<h3 class="text-lg font-bold text-emerald-400 mb-3">📊 AI Ustoz bahosi</h3><div class="grid grid-cols-2 gap-3 text-sm"><div class="bg-[#1e293b] p-3 rounded-xl">Grammatika<div class="text-xl font-bold">${d.grammar}/100</div></div><div class="bg-[#1e293b] p-3 rounded-xl">Lug‘at<div class="text-xl font-bold">${d.vocabulary}/100</div></div><div class="bg-[#1e293b] p-3 rounded-xl">Suhbat<div class="text-xl font-bold">${d.conversation}/100</div></div><div class="bg-[#1e293b] p-3 rounded-xl">Umumiy<div class="text-xl font-bold text-emerald-400">${d.overall}/100</div></div></div><p class="mt-4 text-sm text-gray-300"><b class="text-amber-400">AI tavsiyasi:</b><br>${d.feedback}</p>`}catch(e){b.innerHTML='<p class="text-rose-400">Baholashda xatolik yuz berdi.</p>'}}
 
         // Global click to handle dropdown closing
         document.addEventListener('click', closeDayDropdown);

@@ -1,0 +1,10 @@
+import express from 'express';
+import dotenv from 'dotenv';
+import OpenAI from 'openai';
+dotenv.config();
+const app=express(); app.use(express.json({limit:'1mb'})); app.use(express.static('.'));
+const client=new OpenAI({apiKey:process.env.OPENAI_API_KEY});
+const system=`Siz AI Ustozsiz. Foydalanuvchiga yapon tilini N5/N4 darajada o'rgating. Avval tabiiy yaponcha javob bering. Keyin kerak bo'lsa ✍️ To'g'ri variant, 🇺🇿 O'zbekcha tushuntirish va 📚 yangi so'zlar bilan qisqa yordam bering. Juda uzun yozmang.`;
+app.post('/api/japanese-tutor',async(req,res)=>{try{const completion=await client.chat.completions.create({model:process.env.OPENAI_MODEL||'gpt-5-mini',messages:[{role:'system',content:system},...(req.body.messages||[]).slice(-20).map(m=>({role:m.role,content:m.content}))]});res.json({reply:completion.choices[0]?.message?.content||'Kechirasiz, javob olinmadi.'})}catch(e){console.error(e);res.status(500).json({error:e.message||'AI xatosi'})}});
+app.post('/api/japanese-evaluate',async(req,res)=>{try{const completion=await client.chat.completions.create({model:process.env.OPENAI_MODEL||'gpt-5-mini',response_format:{type:'json_object'},messages:[{role:'system',content:'Yapon tili suhbatini bahola. Faqat JSON qaytar: grammar, vocabulary, conversation, overall (0-100 sonlar), feedback (o‘zbekcha qisqa).'}, {role:'user',content:JSON.stringify(req.body.messages||[])}]});res.json(JSON.parse(completion.choices[0].message.content))}catch(e){console.error(e);res.status(500).json({error:e.message||'Baholash xatosi'})}});
+app.listen(process.env.PORT||3000,()=>console.log('AI Ustoz: http://localhost:3000'));
