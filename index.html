@@ -1868,7 +1868,7 @@ function renderAiMessages() {
   if (!c) return;
   c.innerHTML = aiConversation.map(m => `<div><b>${m.role === 'user' ? 'Siz' : 'AI'}:</b> ${m.parts[0].text}</div>`).join('');
 }
-ochirdim endiasync function sendAiMessage() {
+ async function sendAiMessage() {
   const input = document.getElementById('ai-chat-input');
   const userText = input ? input.value.trim() : '';
 
