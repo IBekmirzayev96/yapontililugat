@@ -1853,14 +1853,81 @@
         }
 
         // AI Ustoz
-        let aiConversation = [];
-        function renderAiTutor(){ if(!aiConversation.length){ aiConversation=[{role:'assistant',content:'こんにちは！私はあなたのAI日本語先生です。\n\nN5/N4 darajasida yaponcha suhbat qilamiz. Yaponcha yozing yoki 🎤 tugmasini bosing!'}]; } renderAiMessages(); }
-        function renderAiMessages(){ const c=document.getElementById('ai-chat-messages'); if(!c)return; c.innerHTML=''; aiConversation.forEach(m=>{const d=document.createElement('div'); d.className=m.role==='user'?'ml-auto max-w-[85%] bg-rose-600 rounded-2xl rounded-br-sm px-4 py-3 text-sm whitespace-pre-wrap':'mr-auto max-w-[85%] bg-[#0f172a] border border-gray-700 rounded-2xl rounded-bl-sm px-4 py-3 text-sm whitespace-pre-wrap'; d.innerText=m.content;c.appendChild(d)});c.scrollTop=c.scrollHeight; }
-        async function sendAiMessage(){ const input=document.getElementById('ai-chat-input'); const msg=input.value.trim(); if(!msg)return; aiConversation.push({role:'user',content:msg});input.value='';renderAiMessages();document.getElementById('ai-status').innerText='🤖 AI javob tayyorlamoqda...';try{const r=await fetch('/api/japanese-tutor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:aiConversation})});const d=await r.json();if(!r.ok)throw new Error(d.error);aiConversation.push({role:'assistant',content:d.reply});renderAiMessages();document.getElementById('ai-status').innerText='AI javob berdi.';speakAiReply(d.reply)}catch(e){document.getElementById('ai-status').innerText='AI serverga ulanib bo‘lmadi. Serverni ishga tushiring.';}}
-        function speakAiReply(text){speechSynthesis.cancel();const jp=text.match(/[ぁ-んァ-ン一-龯々ー、。！？\s]+/g)?.join(' ');if(!jp?.trim())return;const u=new SpeechSynthesisUtterance(jp);u.lang='ja-JP';u.rate=.85;speechSynthesis.speak(u)}
-        function startAiVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Brauzer ovoz tanishni qo‘llab-quvvatlamaydi. Chrome ishlating.');return}const r=new SR();r.lang='ja-JP';r.interimResults=false;document.getElementById('ai-status').innerText='🎤 Sizni tinglayapman...';r.onresult=e=>{document.getElementById('ai-chat-input').value=e.results[0][0].transcript;sendAiMessage()};r.onerror=()=>document.getElementById('ai-status').innerText='Mikrofon xatosi. Qayta urinib ko‘ring.';r.start()}
-        async function finishAiConversation(){if(aiConversation.filter(x=>x.role==='user').length<1){alert('Avval AI bilan suhbat qiling.');return}const b=document.getElementById('ai-evaluation');b.classList.remove('hidden');b.innerHTML='📊 Suhbat tahlil qilinmoqda...';try{const r=await fetch('/api/japanese-evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:aiConversation})});const d=await r.json();b.innerHTML=`<h3 class="text-lg font-bold text-emerald-400 mb-3">📊 AI Ustoz bahosi</h3><div class="grid grid-cols-2 gap-3 text-sm"><div class="bg-[#1e293b] p-3 rounded-xl">Grammatika<div class="text-xl font-bold">${d.grammar}/100</div></div><div class="bg-[#1e293b] p-3 rounded-xl">Lug‘at<div class="text-xl font-bold">${d.vocabulary}/100</div></div><div class="bg-[#1e293b] p-3 rounded-xl">Suhbat<div class="text-xl font-bold">${d.conversation}/100</div></div><div class="bg-[#1e293b] p-3 rounded-xl">Umumiy<div class="text-xl font-bold text-emerald-400">${d.overall}/100</div></div></div><p class="mt-4 text-sm text-gray-300"><b class="text-amber-400">AI tavsiyasi:</b><br>${d.feedback}</p>`}catch(e){b.innerHTML='<p class="text-rose-400">Baholashda xatolik yuz berdi.</p>'}}
+        // AI Ustoz
+let aiConversation = [];
 
+function renderAiTutor() {
+  if (!aiConversation.length) {
+    aiConversation = [{ role: 'user', parts: [{ text: "Salom, yapon tili ustozisiz." }] }];
+  }
+}
+
+function renderAiMessages() {
+  const c = document.getElementById('ai-chat-messages');
+  if (!c) return;
+  c.innerHTML = aiConversation.map(m => `<div><b>${m.role === 'user' ? 'Siz' : 'AI'}:</b> ${m.parts[0].text}</div>`).join('');
+}
+
+async function sendAiMessage() {
+  const input = document.getElementById('ai-chat-input');
+  const userText = input ? input.value.trim() : '';
+  if (!userText) return;
+
+  aiConversation.push({ role: 'user', parts: [{ text: userText }] });
+  if (input) input.value = '';
+  renderAiMessages();
+
+  // 🔑 SHU YERGA O'ZINGIZNING API KALITINGIZNI QO'YING:
+  const API_KEY = "AQ.Ab8RN6J69h_... SHU YERGA API KALIT";
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: aiConversation })
+    });
+
+    const data = await response.json();
+
+    if (data.candidates && data.candidates[0].content.parts[0].text) {
+      const aiReply = data.candidates[0].content.parts[0].text;
+      aiConversation.push({ role: 'model', parts: [{ text: aiReply }] });
+      renderAiMessages();
+      if (typeof speakAiReply === 'function') speakAiReply(aiReply);
+    } else {
+      alert("API kalitida xatolik bor yoki javob olinmadi.");
+    }
+  } catch (err) {
+    alert("Xatolik: " + err.message);
+  }
+}
+
+function speakAiReply(text) {
+  speechSynthesis.cancel();
+  const jp = text.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g);
+  if (jp) {
+    const ut = new SpeechSynthesisUtterance(jp.join(''));
+    ut.lang = 'ja-JP';
+    speechSynthesis.speak(ut);
+  }
+}
+
+function startAiVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return alert("Brauzeringiz ovozni qo'llab-quvvatlamaydi");
+  const rec = new SR();
+  rec.lang = 'ja-JP';
+  rec.onresult = (e) => {
+    const inp = document.getElementById('ai-chat-input');
+    if (inp) inp.value = e.results[0][0].transcript;
+  };
+  rec.start();
+}
+
+async function finishAiConversation() {
+  aiConversation = [];
+  renderAiMessages();
+}saqladim
         // Global click to handle dropdown closing
         document.addEventListener('click', closeDayDropdown);
 
