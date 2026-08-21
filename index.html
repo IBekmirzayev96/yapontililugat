@@ -1904,7 +1904,61 @@ async function sendAiMessage() {
     }
   } catch (err) {
     alert("Tarmoq xatosi: " + err.message);
+  }async function sendAiMessage() {
+  const input = document.getElementById('ai-chat-input');
+  const userText = input ? input.value.trim() : '';
+
+  if (!userText) return;
+
+  aiConversation.push({
+    role: 'user',
+    parts: [{ text: userText }]
+  });
+
+  if (input) input.value = '';
+  renderAiMessages();
+
+  try {
+    const response = await fetch(
+      'https://yapontililugat.bekmirzayevislomjon777.workers.dev/api/japanese-tutor',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: aiConversation.map(m => ({
+            role: m.role === 'model' ? 'assistant' : 'user',
+            content: m.parts[0].text
+          }))
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.error) {
+      alert('AI xatosi: ' + data.error);
+      return;
+    }
+
+    const aiReply = data.reply;
+
+    aiConversation.push({
+      role: 'model',
+      parts: [{ text: aiReply }]
+    });
+
+    renderAiMessages();
+
+    if (typeof speakAiReply === 'function') {
+      speakAiReply(aiReply);
+    }
+
+  } catch (error) {
+    alert('Ulanish xatosi: ' + error.message);
   }
+}
 }
 
 
