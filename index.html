@@ -8,8 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .perspective { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
+        .transform-style-3d { transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
     </style>
 </head>
@@ -26,11 +26,10 @@
                 <p class="text-xs text-gray-400">JLPT N5 Kanji, Lug'at, Grammatika & Dialoglar</p>
             </div>
         </div>
-        <div class="flex items-center gap-3">
-            <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-rose-400 font-semibold">
-                <i class="fa-solid fa-calendar-check text-rose-500"></i>
-                <span id="daily-streak">0</span> <span class="text-gray-400 text-xs font-normal">Kun</span>
-            </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-plus"></i> So'z Qo'shish
+            </button>
             <div class="bg-[#1e293b] border border-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-amber-400 font-semibold">
                 <i class="fa-solid fa-fire text-amber-500"></i>
                 <span id="streak">0</span> <span class="text-gray-400 text-xs font-normal">Ochko</span>
@@ -40,16 +39,6 @@
 
     <!-- Main Content -->
     <main class="max-w-2xl mx-auto w-full flex-1 flex flex-col items-center justify-center my-6 gap-6">
-        
-        <!-- Kun so'zi -->
-        <div class="w-full bg-gradient-to-r from-rose-900/40 to-slate-800 border border-rose-500/30 rounded-xl p-4 flex items-center justify-between shadow-lg">
-            <div>
-                <span class="text-[10px] font-extrabold text-rose-400 tracking-widest uppercase block">KUN SO'ZI</span>
-                <span id="daily-word" class="text-xl font-bold text-white">男</span>
-                <span id="daily-reading" class="text-xs text-gray-300 ml-2">(おとこ)</span>
-            </div>
-            <div id="daily-meaning" class="text-sm text-emerald-400 font-medium">Erkak, yigit</div>
-        </div>
 
         <!-- Mode Switcher -->
         <div class="bg-[#1e293b] p-1.5 rounded-xl flex gap-1.5 border border-gray-700/50 w-full overflow-x-auto justify-start md:justify-center">
@@ -57,7 +46,7 @@
                 <i class="fa-solid fa-clone"></i> Flashcard
             </button>
             <button type="button" id="mode-dialogue" onclick="switchMode('dialogue')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                <i class="fa-solid fa-[#10b981] fa-comments text-emerald-400"></i> Muloqot
+                <i class="fa-solid fa-comments text-emerald-400"></i> Muloqot
             </button>
             <button type="button" id="mode-grammar" onclick="switchMode('grammar')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-book-bookmark"></i> Grammatika
@@ -66,7 +55,7 @@
                 <i class="fa-solid fa-graduation-cap"></i> Test
             </button>
             <button type="button" id="mode-audio" onclick="switchMode('audio')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                <i class="fa-solid fa-headphones"></i> Audio-Test
+                <i class="fa-solid fa-headphones"></i> Audio
             </button>
             <button type="button" id="mode-reverse" onclick="switchMode('reverse')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-language"></i> UZ → JP
@@ -74,33 +63,70 @@
             <button type="button" id="mode-speech" onclick="switchMode('speech')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-microphone"></i> Talaffuz
             </button>
-            <button type="button" id="mode-speed" onclick="switchMode('speed')" class="px-3 py-2 rounded-lg text-xs font-medium text-amber-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
-                <i class="fa-solid fa-stopwatch"></i> Taymer (30s)
-            </button>
             <button type="button" id="mode-list" onclick="switchMode('list')" class="px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap">
                 <i class="fa-solid fa-list-check"></i> Qidiruv
             </button>
         </div>
 
-        <!-- Level Selector -->
-        <select id="level-select" onchange="changeCategory()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer w-full">
-            <option value="n5_kanji">JLPT N5 — Kanji (Iyerogliflar)</option>
-            <option value="n5_vocab">JLPT N5 — Lug'at (Kotoba)</option>
-        </select>
+        <!-- Filter Controls -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+            <div class="relative" onclick="event.stopPropagation()">
+                <label class="text-[11px] text-gray-400 font-semibold mb-1 flex justify-between items-center">
+                    <span>DARS / KUN BO'LIMLARI (1-19):</span>
+                    <span class="text-rose-400 cursor-pointer hover:underline" onclick="toggleAllDays()">Barchasi / Tozalash</span>
+                </label>
+                <div onclick="toggleDayDropdown()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 flex justify-between items-center cursor-pointer min-h-[42px]">
+                    <span id="selected-days-text" class="truncate text-rose-400 font-semibold">1-19 kunlar tanlangan</span>
+                    <i class="fa-solid fa-chevron-down text-xs text-gray-400 ml-2"></i>
+                </div>
 
-        <!-- 1. FLASHCARD SECTION -->
+                <div id="day-dropdown-menu" class="hidden absolute top-full left-0 right-0 mt-1 bg-[#1e293b] border border-gray-700 rounded-xl p-3 z-50 shadow-2xl max-h-60 overflow-y-auto space-y-1.5">
+                    <div class="flex justify-between items-center pb-2 mb-2 border-b border-gray-700 text-xs">
+                        <button type="button" onclick="selectAllDays()" class="text-emerald-400 font-semibold hover:underline">Barchasini tanlash</button>
+                        <button type="button" onclick="deselectAllDays()" class="text-rose-400 font-semibold hover:underline">Tozalash</button>
+                    </div>
+                    <div id="days-checkbox-container" class="grid grid-cols-2 gap-1.5"></div>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[11px] text-gray-400 font-semibold mb-1 block">TURKUM (KATEGORIYA):</label>
+                <select id="level-select" onchange="changeCategory()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer w-full">
+                    <option value="n5_kanji">JLPT N5 — Kanji (Iyerogliflar)</option>
+                    <option value="n5_vocab">JLPT N5 — Lug'at (Kotoba)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- TARTIBLASH REJIMI PANELI -->
+        <div class="w-full bg-[#1e293b]/60 border border-gray-800 p-3 rounded-xl flex flex-col gap-1.5">
+            <span class="text-[11px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-arrow-down-short-wide text-amber-400"></i> TARTIBLASH REJIMI:
+            </span>
+            <div class="grid grid-cols-2 gap-2 w-full">
+                <button type="button" id="sort-sequential-btn" onclick="setSortMode('sequential')" class="bg-rose-600 text-white py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-lg">
+                    <i class="fa-solid fa-arrow-down-1-9"></i> Tartib bilan
+                </button>
+                <button type="button" id="sort-random-btn" onclick="setSortMode('random')" class="bg-[#0f172a] text-gray-400 border border-gray-700/80 hover:text-white py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-shuffle"></i> Aralash
+                </button>
+            </div>
+        </div>
+
+        <!-- FLASHCARD SECTION -->
         <div id="section-flashcard" class="w-full flex flex-col items-center gap-4">
             <div class="w-full h-[280px] perspective cursor-pointer" onclick="flipCard()">
-                <div id="card-inner" class="w-full h-full relative transform-style-3d transition-transform duration-500 shadow-2xl rounded-2xl">
-                    <div class="absolute w-full h-full backface-hidden bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-                        <span id="card-category-label" class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-2">YAPONCHA</span>
-                        <div id="kanji-display" class="text-6xl font-extrabold text-white my-2">男</div>
-                        <div id="reading-display" class="text-gray-300 text-lg tracking-wide">おとこ / ダン</div>
-                        <span class="text-[11px] text-gray-500 mt-4"><i class="fa-solid fa-rotate"></i> Ma'nosini ko'rish uchun ustiga bosing</span>
+                <div id="card-inner" class="w-full h-full relative transform-style-3d shadow-2xl rounded-2xl">
+                    <div class="absolute w-full h-full backface-hidden bg-[#1e293b]/90 border border-gray-700/80 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+                        <span id="card-category-label" class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-2">KANJI / YAPONCHA</span>
+                        <div id="kanji-display" class="text-6xl font-extrabold text-white my-4 px-2 text-center">-</div>
+                        <span class="text-[11px] text-gray-500 mt-2"><i class="fa-solid fa-rotate"></i> O'qilishi va ma'nosini ko'rish uchun bosing</span>
                     </div>
                     <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-[#1e293b] border border-rose-500/50 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-                        <span class="text-xs font-semibold text-emerald-400 tracking-widest uppercase mb-2">O'ZBEKCHA MA'NOSI</span>
-                        <div id="meaning-display" class="text-2xl font-bold text-emerald-300">Erkak, yigit</div>
+                        <span class="text-xs font-semibold text-emerald-400 tracking-widest uppercase mb-1">O'QILISHI & TARJIMA</span>
+                        <div id="reading-display" class="text-2xl font-extrabold text-amber-300 mb-1">-</div>
+                        <div id="romaji-display" class="text-sm font-mono text-gray-400 mb-3">-</div>
+                        <div id="meaning-display" class="text-xl font-bold text-emerald-300 border-t border-gray-700/60 pt-2 w-full max-w-[250px]">-</div>
                     </div>
                 </div>
             </div>
@@ -117,69 +143,54 @@
                 </button>
             </div>
             <div class="text-gray-400 text-xs font-medium tracking-wider">
-                <span id="current-index" class="text-white">1</span> / <span id="total-cards">8</span>
+                <span id="current-index" class="text-white">0</span> / <span id="total-cards">0</span>
             </div>
         </div>
 
-        <!-- 2. AUDIO-MULOQOT (DIALOG) SECTION -->
+        <!-- MULOQOT SECTION -->
         <div id="section-dialogue" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center gap-4">
             <div class="w-full flex justify-between items-center border-b border-gray-700/50 pb-3">
                 <span class="text-xs font-semibold text-emerald-400 tracking-widest uppercase"><i class="fa-solid fa-comments"></i> INTERAKTIV MULOQOT</span>
-                <span class="text-xs text-gray-400"><span id="dialogue-index" class="text-white">1</span> / <span id="dialogue-total">3</span></span>
+                <span class="text-xs text-gray-400"><span id="dialogue-index" class="text-white">0</span> / <span id="dialogue-total">0</span></span>
             </div>
-
             <div class="w-full flex items-center justify-between my-1">
                 <div>
-                    <h3 id="dialogue-title" class="text-lg font-bold text-white">Do'konda xarid qilish</h3>
-                    <p id="dialogue-desc" class="text-xs text-gray-400">Kassir va xaridor o'rtasidagi so'zlashuv</p>
+                    <h3 id="dialogue-title" class="text-lg font-bold text-white">Suhbat</h3>
+                    <p id="dialogue-desc" class="text-xs text-gray-400">Tegishli dialog</p>
                 </div>
-                <button type="button" onclick="playFullDialogue()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition">
-                    <i class="fa-solid fa-play"></i> To'liq eshitish
-                </button>
             </div>
-
             <div id="dialogue-lines-container" class="w-full flex flex-col gap-3 my-2 max-h-[320px] overflow-y-auto pr-1"></div>
-
             <div class="flex items-center justify-between w-full gap-4 mt-2">
                 <button type="button" onclick="prevDialogue()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/2 justify-center">
-                    <i class="fa-solid fa-chevron-left"></i> Oldingi Muloqot
+                    <i class="fa-solid fa-chevron-left"></i> Oldingi
                 </button>
                 <button type="button" onclick="nextDialogue()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/2 justify-center">
-                    Keyingi Muloqot <i class="fa-solid fa-chevron-right"></i>
+                    Keyingi <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
         </div>
 
-        <!-- 3. GRAMMAR CARDS SECTION -->
+        <!-- GRAMMATIKA SECTION -->
         <div id="section-grammar" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center gap-4">
             <div class="w-full flex justify-between items-center border-b border-gray-700/50 pb-3">
                 <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase">JLPT N5 GRAMMATIKA</span>
-                <span class="text-xs text-gray-400"><span id="grammar-index" class="text-white">1</span> / <span id="grammar-total">5</span></span>
+                <span class="text-xs text-gray-400"><span id="grammar-index" class="text-white">0</span> / <span id="grammar-total">0</span></span>
             </div>
-            
             <div class="w-full text-center my-2">
-                <h3 id="grammar-title" class="text-2xl font-bold text-amber-400 mb-1">〜たいです (Taidesu)</h3>
-                <p id="grammar-formula" class="text-xs font-mono bg-[#0f172a] px-3 py-1.5 rounded-lg text-rose-300 inline-block border border-gray-800">Fe'l (Mas-form) + たいです</p>
+                <h3 id="grammar-title" class="text-2xl font-bold text-amber-400 mb-1">-</h3>
+                <p id="grammar-formula" class="text-xs font-mono bg-[#0f172a] px-3 py-1.5 rounded-lg text-rose-300 inline-block border border-gray-800">-</p>
             </div>
-
-            <div class="w-full bg-[#0f172a] p-4 rounded-xl border border-gray-800 text-sm text-gray-300 leading-relaxed" id="grammar-explanation">
-                Biror harakatni bajarish istagini bildiradi.
-            </div>
-
+            <div class="w-full bg-[#0f172a] p-4 rounded-xl border border-gray-800 text-sm text-gray-300 leading-relaxed" id="grammar-explanation">-</div>
             <div class="w-full bg-slate-900/60 p-4 rounded-xl border border-rose-500/20 flex flex-col gap-2">
                 <span class="text-[10px] font-bold text-emerald-400 tracking-wider uppercase">NAMUNA JUMLA</span>
                 <div class="flex justify-between items-center">
                     <div>
-                        <div id="grammar-example-jp" class="text-base font-bold text-white">日本へ行きたいです。</div>
-                        <div id="grammar-example-reading" class="text-xs text-gray-400">Nihon e ikitaidesu.</div>
-                        <div id="grammar-example-uz" class="text-sm text-emerald-300 mt-1">Yaponiyaga borishni xohlayman.</div>
+                        <div id="grammar-example-jp" class="text-base font-bold text-white">-</div>
+                        <div id="grammar-example-reading" class="text-xs text-gray-400">-</div>
+                        <div id="grammar-example-uz" class="text-sm text-emerald-300 mt-1">-</div>
                     </div>
-                    <button type="button" onclick="speakGrammarExample()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-rose-400">
-                        <i class="fa-solid fa-volume-high"></i>
-                    </button>
                 </div>
             </div>
-
             <div class="flex items-center justify-between w-full gap-4 mt-2">
                 <button type="button" onclick="prevGrammar()" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition w-1/2 justify-center">
                     <i class="fa-solid fa-chevron-left"></i> Oldingisi
@@ -190,691 +201,954 @@
             </div>
         </div>
 
-        <!-- 4. STANDART TEST SECTION -->
+        <!-- TEST SECTION -->
         <div id="section-quiz" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">STANDART TEST</span>
-            <div id="quiz-question" class="text-5xl font-extrabold text-white my-3">男</div>
+            <div id="quiz-question" class="text-5xl font-extrabold text-white my-3">-</div>
             <p class="text-xs text-gray-400 mb-4">To'g'ri tarjimani tanlang:</p>
             <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
         </div>
 
-        <!-- 5. AUDIO-TEST SECTION -->
+        <!-- AUDIO TEST -->
         <div id="section-audio" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">AUDIO TEST</span>
-            <p class="text-xs text-gray-400 mb-4">So'zni eshiting va to'g'ri javobni toping:</p>
+            <p class="text-xs text-gray-400 mb-4">So'zni eshiting va to'g'ri tarjimani toping:</p>
             <button type="button" onclick="playAudioQuestion()" class="bg-rose-600 hover:bg-rose-500 text-white p-5 rounded-full my-2 shadow-lg transition">
                 <i class="fa-solid fa-volume-high text-2xl"></i>
             </button>
             <div id="audio-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-4"></div>
         </div>
 
-        <!-- 6. REVERSE QUIZ SECTION (UZ -> JP) -->
+        <!-- REVERSE QUIZ -->
         <div id="section-reverse" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
-            <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">O'ZBEKCHA → YAPONCHA TEST</span>
-            <div id="reverse-question" class="text-2xl font-bold text-emerald-400 my-4 text-center">Erkak, yigit</div>
-            <p class="text-xs text-gray-400 mb-4">Tegishli yaponcha so'zni tanlang:</p>
+            <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">O'ZBEKCHA → YAPONCHA</span>
+            <div id="reverse-question" class="text-2xl font-bold text-emerald-400 my-4 text-center">-</div>
             <div id="reverse-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full"></div>
         </div>
 
-        <!-- 7. TALAFFUZNI TEKSHIRISH SECTION -->
+        <!-- TALAFFUZ -->
         <div id="section-speech" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center text-center">
             <span class="text-xs font-semibold text-rose-400 tracking-widest uppercase mb-1">TALAFFUZ AMALIYOTI</span>
-            <div id="speech-target" class="text-4xl font-extrabold text-white my-2">男</div>
-            <div id="speech-target-reading" class="text-sm text-amber-400 mb-4">おとこ (otoko)</div>
-            
-            <div id="speech-status" class="text-xs text-gray-400 mb-4 min-h-[20px]">
-                Mikrofon tugmasini bosing va so'zni yaponcha ayting...
-            </div>
-
-            <button type="button" id="btn-mic" onclick="startSpeechRecognition()" class="bg-rose-600 hover:bg-rose-500 text-white w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-lg transition my-2">
+            <div id="speech-target" class="text-4xl font-extrabold text-white my-2">-</div>
+            <div id="speech-target-reading" class="text-sm text-amber-400 mb-4">-</div>
+            <div id="speech-status" class="text-xs text-gray-400 mb-4 min-h-[20px]">Mikrofonni bosing va yaponcha ayting...</div>
+            <button type="button" onclick="startSpeechRecognition()" class="bg-rose-600 hover:bg-rose-500 text-white w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-lg transition my-2">
                 <i class="fa-solid fa-microphone"></i>
             </button>
-
             <div id="speech-result" class="mt-4 p-3 bg-[#0f172a] rounded-xl border border-gray-800 w-full text-sm font-semibold hidden"></div>
-            
-            <button type="button" onclick="generateSpeechTask()" class="mt-4 text-xs text-gray-400 hover:text-white underline">
-                Boshqa so'zga o'tish
-            </button>
         </div>
 
-        <!-- 8. TAYMERLI TEST SECTION -->
-        <div id="section-speed" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col items-center">
-            <div class="w-full flex justify-between items-center mb-2">
-                <span class="text-xs font-semibold text-amber-400 tracking-widest uppercase">TEZKOR TEST</span>
-                <span class="text-xl font-mono font-bold text-rose-500"><i class="fa-solid fa-clock"></i> <span id="timer-display">30</span>s</span>
-            </div>
-            
-            <div id="speed-start-container" class="text-center my-6">
-                <p class="text-sm text-gray-300 mb-4">30 soniya ichida imkon qadar ko'proq to'g'ri javob toping!</p>
-                <button type="button" onclick="startSpeedChallenge()" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold px-6 py-3 rounded-xl text-sm transition">
-                    Boshlash!
-                </button>
-            </div>
-
-            <div id="speed-game-container" class="w-full hidden flex-col items-center">
-                <div id="speed-question" class="text-4xl font-extrabold text-white my-3">男</div>
-                <div id="speed-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full mt-2"></div>
-            </div>
-        </div>
-
-        <!-- 9. QIDIRUV VA LUG'AT SECTION -->
+        <!-- QIDIRUV VA LUG'AT -->
         <div id="section-list" class="w-full bg-[#1e293b]/80 border border-gray-700/80 rounded-2xl p-6 hidden flex-col gap-4">
-            <div class="flex gap-2">
-                <div class="relative flex-1">
-                    <input type="text" id="search-input" onkeyup="filterList()" placeholder="So'z, kanji yoki tarjimani qidiring..." class="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500">
-                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-3 text-gray-500 text-sm"></i>
-                </div>
-                <button type="button" onclick="toggleMistakesFilter()" id="btn-mistakes-filter" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-2.5 rounded-xl text-xs font-semibold text-amber-400 flex items-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Xatolar (<span id="mistake-count">0</span>)
-                </button>
-            </div>
+            <input type="text" id="search-input" onkeyup="filterList()" placeholder="So'z, kanji yoki tarjimani qidiring..." class="w-full bg-[#0f172a] border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 text-white">
             <div id="words-list" class="max-h-[300px] overflow-y-auto space-y-2 pr-1"></div>
         </div>
 
     </main>
 
-    <footer class="text-center text-xs text-gray-500 py-4 border-t border-gray-800/50">
-        Yapon tili o'rganish interaktiv platformasi • JLPT N5
-    </footer>
+    <!-- YANGI SO'Z QO'SHISH MODAL OYNASI -->
+    <div id="add-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1e293b] border border-gray-700 rounded-2xl p-6 w-full max-w-md shadow-2xl flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <h3 class="text-base font-bold text-white">Yangi So'z yoki Kanji Qo'shish</h3>
+                <button onclick="closeAddModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <form onsubmit="saveCustomWord(event)" class="flex flex-col gap-3">
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Kun (Dars):</label>
+                    <select id="custom-day-select" class="w-full bg-[#0f172a] border border-gray-700 text-white text-sm rounded-lg p-2.5"></select>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Turkum:</label>
+                    <select id="custom-cat-select" class="w-full bg-[#0f172a] border border-gray-700 text-white text-sm rounded-lg p-2.5">
+                        <option value="n5_kanji">Kanji (Iyeroglif)</option>
+                        <option value="n5_vocab">Lug'at (Kotoba)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">So'z / Kanji (Yaponcha):</label>
+                    <input type="text" id="custom-word" required placeholder="Masalan: 本 yoki ほん" class="w-full bg-[#0f172a] border border-gray-700 text-white text-sm rounded-lg p-2.5">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">O'qilishi (Hiragana/Katakana):</label>
+                    <input type="text" id="custom-reading" required placeholder="Masalan: ほん" class="w-full bg-[#0f172a] border border-gray-700 text-white text-sm rounded-lg p-2.5">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Romaji (Lotincha):</label>
+                    <input type="text" id="custom-romaji" placeholder="Masalan: hon" class="w-full bg-[#0f172a] border border-gray-700 text-white text-sm rounded-lg p-2.5">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">O'zbekcha Ma'nosi:</label>
+                    <input type="text" id="custom-meaning" required placeholder="Masalan: Kitob" class="w-full bg-[#0f172a] border border-gray-700 text-white text-sm rounded-lg p-2.5">
+                </div>
+
+                <div class="flex gap-2 mt-2">
+                    <button type="button" onclick="closeAddModal()" class="w-1/2 bg-gray-700 hover:bg-gray-600 text-white py-2.5 rounded-xl text-xs font-bold">Bekor qilish</button>
+                    <button type="submit" class="w-1/2 bg-rose-600 hover:bg-rose-500 text-white py-2.5 rounded-xl text-xs font-bold">Saqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         const database = {
             n5_kanji: [
-                { word: '男', reading: 'おとこ / ダン', meaning: "Erkak, yigit, odam" },
-                { word: '林', reading: 'はやし / リン', meaning: "Yog'och, kichik o'rmon" },
-                { word: '森', reading: 'もり / シン', meaning: "O'rmon, changalzor" },
-                { word: '休', reading: 'やす・む / キュウ', meaning: "Dam olish, bayram" },
-                { word: '体', reading: 'からだ / タイ', meaning: "Tana, jismoniy holat" },
-                { word: '住', reading: 'す・む / ジュウ', meaning: "Yashamoq, manzil" },
-                { word: '明', reading: 'あか・るい / メイ', meaning: "Yorqin, yorug', aniq" },
-                { word: '字', reading: 'あざ / ジ', meaning: "Harf, belgi, iyeroglif" }
+                // 1-KUN (山, 川, 田)
+                { day: 1, word: '山', reading: 'やま', romaji: 'yama', meaning: "Tog'" },
+                { day: 1, word: '富士山', reading: 'ふじさん', romaji: 'fujisan', meaning: "Fuji tog'i" },
+                { day: 1, word: '山道', reading: 'やまみち', romaji: 'yamamichi', meaning: "Tog' yo'li" },
+                { day: 1, word: '登山', reading: 'とざん', romaji: 'tozan', meaning: "Tog'ga chiqish" },
+                { day: 1, word: '火山', reading: 'かざん', romaji: 'kazan', meaning: "Vulqon" },
+                { day: 1, word: '川', reading: 'かわ', romaji: 'kawa', meaning: "Daryo" },
+                { day: 1, word: '天の川', reading: 'あまのがわ', romaji: 'amanogawa', meaning: "Somon yo'li" },
+                { day: 1, word: 'ナイル川', reading: 'ないるがわ', romaji: 'nairugawa', meaning: "Nil daryosi" },
+                { day: 1, word: '川遊び', reading: 'かわあそび', romaji: 'kawaasobi', meaning: "Daryo bo'yida oynash/hordiq" },
+                { day: 1, word: '河川', reading: 'かせん', romaji: 'kasen', meaning: "Daryolar / Suv yo'llari" },
+                { day: 1, word: '田んぼ', reading: 'たんぼ', romaji: 'tanbo', meaning: "Guruch (sholi) maydoni" },
+                { day: 1, word: '田植え', reading: 'たうえ', romaji: 'taue', meaning: "Sholi ekish" },
+                { day: 1, word: '田舎', reading: 'いなか', romaji: 'inaka', meaning: "Qishloq" },
+                { day: 1, word: '水田', reading: 'すいでん', romaji: 'suiden', meaning: "Suvli guruch maydoni" },
+                { day: 1, word: '田園', reading: 'でんえん', romaji: "den'en", meaning: "Qishloq yerlari / Dala" },
+
+                // 2-KUN (日, 月, 火)
+                { day: 2, word: '日曜日', reading: 'にちようび', romaji: 'nichiyoubi', meaning: "Yakshanba" },
+                { day: 2, word: '日本', reading: 'にほん', romaji: 'nihon', meaning: "Yaponiya" },
+                { day: 2, word: '誕生日', reading: 'たんじょうび', romaji: 'tanjoubi', meaning: "Tug'ilgan kun" },
+                { day: 2, word: '毎日', reading: 'まいにち', romaji: 'mainichi', meaning: "Har kuni" },
+                { day: 2, word: '日記', reading: 'にっき', romaji: 'nikki', meaning: "Kundalik" },
+                { day: 2, word: '月', reading: 'つき', romaji: 'tsuki', meaning: "Oy (osmondagi / vaqt)" },
+                { day: 2, word: '一月', reading: 'いちがつ', romaji: 'ichigatsu', meaning: "Yanvar" },
+                { day: 2, word: '毎月', reading: 'まいつき', romaji: 'maitsuki', meaning: "Har oy" },
+                { day: 2, word: '来月', reading: 'らいげつ', romaji: 'raigetsu', meaning: "Keyingi oy" },
+                { day: 2, word: 'お正月', reading: 'おしょうがつ', romaji: 'oshougatsu', meaning: "Yangi yil bayrami" },
+                { day: 2, word: '火', reading: 'ひ', romaji: 'hi', meaning: "Olov" },
+                { day: 2, word: '火事', reading: 'かじ', romaji: 'kaji', meaning: "Yong'in" },
+                { day: 2, word: '花火', reading: 'はなび', romaji: 'hanabi', meaning: "Mushakbozlik" },
+                { day: 2, word: '火山', reading: 'かざん', romaji: 'kazan', meaning: "Vulqon" },
+                { day: 2, word: '火曜日', reading: 'かようび', romaji: 'kayoubi', meaning: "Seshanba" },
+
+                // 3-KUN (水, 木, 金)
+                { day: 3, word: '水', reading: 'みず', romaji: 'mizu', meaning: "Suv" },
+                { day: 3, word: '水泳', reading: 'すいえい', romaji: 'suiei', meaning: "Suzish" },
+                { day: 3, word: '水着', reading: 'みずぎ', romaji: 'mizugi', meaning: "Cho'milish kostyumi" },
+                { day: 3, word: '水道', reading: 'すいどう', romaji: 'suidou', meaning: "Suv ta'minoti tizimi" },
+                { day: 3, word: '水色', reading: 'みずいろ', romaji: 'mizuiro', meaning: "Och ko'k (suv rangi)" },
+                { day: 3, word: '木', reading: 'き', romaji: 'ki', meaning: "Daraxt" },
+                { day: 3, word: '木曜日', reading: 'もくようび', romaji: 'mokuyoubi', meaning: "Payshanba" },
+                { day: 3, word: '木陰', reading: 'こかげ', romaji: 'kokage', meaning: "Daraxt soyasi" },
+                { day: 3, word: 'お金', reading: 'おかね', romaji: 'okane', meaning: "Pul" },
+                { day: 3, word: '現金', reading: 'げんきん', romaji: 'genkin', meaning: "Naqd pul" },
+                { day: 3, word: '料金', reading: 'りょうきん', romaji: 'ryoukin', meaning: "To'lov" },
+                { day: 3, word: '税金', reading: 'ぜいきん', romaji: 'zeikin', meaning: "Soliq" },
+                { day: 3, word: '金閣寺', reading: 'きんかくじ', romaji: 'kinkakuji', meaning: "Kinkaku-ji ibodatxonasi" },
+
+                // 4-KUN (車, 門, 人, 子)
+                { day: 4, word: '車', reading: 'くるま', romaji: 'kuruma', meaning: "Mashina" },
+                { day: 4, word: '電車', reading: 'でんしゃ', romaji: 'densha', meaning: "Poyezd (elektr poyezdi)" },
+                { day: 4, word: '自転車', reading: 'じてんしゃ', romaji: 'jitensha', meaning: "Velosiped" },
+                { day: 4, word: '駐車場', reading: 'ちゅうしゃじょう', romaji: 'chuushajou', meaning: "Avtoturar goh" },
+                { day: 4, word: '車いす', reading: 'くるまいす', romaji: 'kurumaisu', meaning: "Nogironlar aravachasi" },
+                { day: 4, word: '門', reading: 'もん', romaji: 'mon', meaning: "Darvoza" },
+                { day: 4, word: '専門', reading: 'せんもん', romaji: 'senmon', meaning: "Mutaxassislik" },
+                { day: 4, word: '人口', reading: 'じんこう', romaji: 'jinkou', meaning: "Aholi soni" },
+                { day: 4, word: '男子', reading: 'だんし', romaji: 'danshi', meaning: "O'g'il bola / Erkak" },
+
+                // 5-KUN (人, 子, 女, 竹, 雨, 貝)
+                { day: 5, word: '人', reading: 'ひと', romaji: 'hito', meaning: "Odam" },
+                { day: 5, word: '日本人', reading: 'にほんじん', romaji: 'nihonjin', meaning: "Yapon (millat)" },
+                { day: 5, word: '一人', reading: 'ひとり', romaji: 'hitori', meaning: "Bir kishi / Bir o'zi" },
+                { day: 5, word: '大人', reading: 'おとな', romaji: 'otona', meaning: "Katta odam / Voyaga yetgan" },
+                { day: 5, word: '子ども', reading: 'こども', romaji: 'kodomo', meaning: "Bola" },
+                { day: 5, word: '女子', reading: 'じょし', romaji: 'joshi', meaning: "Qiz / Ayol" },
+                { day: 5, word: '電子レンジ', reading: 'でんしれんじ', romaji: 'denshirenji', meaning: "Mikrotolqinli pech" },
+                { day: 5, word: '調子', reading: 'ちょうし', romaji: 'choushi', meaning: "Holat / Kayfiyat" },
+                { day: 5, word: '女', reading: 'おんな', romaji: 'onna', meaning: "Ayol" },
+                { day: 5, word: '彼女', reading: 'かのじょ', romaji: 'kanojyo', meaning: "U (ayol) / Qiz do'sti" },
+                { day: 5, word: '竹', reading: 'たけ', romaji: 'take', meaning: "Bambuk" },
+                { day: 5, word: '竹林', reading: 'ちくりん', romaji: 'chikurin', meaning: "Bambuk chakalakzori" },
+                { day: 5, word: '竹の子', reading: 'たけのこ', romaji: 'takenoko', meaning: "Bambuk yosh niholi" },
+                { day: 5, word: '雨', reading: 'あめ', romaji: 'ame', meaning: "Yomg'ir" },
+                { day: 5, word: '大雨', reading: 'おおあめ', romaji: 'ooame', meaning: "Kuchli yomg'ir" },
+                { day: 5, word: '梅雨', reading: 'つゆ', romaji: 'tsuyu', meaning: "Yoz boshidagi yomg'irli fasl" },
+                { day: 5, word: '雨季', reading: 'うき', romaji: 'uki', meaning: "Yomg'irli mavsum" },
+                { day: 5, word: '貝', reading: 'かい', romaji: 'kai', meaning: "Chig'anoq" },
+                { day: 5, word: '貝がら', reading: 'かいがら', romaji: 'kaigara', meaning: "Chig'anoq qobig'i" },
+                { day: 5, word: '貝柱', reading: 'かいばしら', romaji: 'kaibashira', meaning: "Chig'anoq go'shti (ichki qismi)" },
+
+                // 6-KUN (鳥, 馬, 米, 夕)
+                { day: 6, word: '鳥', reading: 'とり', romaji: 'tori', meaning: "Qush" },
+                { day: 6, word: '焼き鳥', reading: 'やきとり', romaji: 'yakitori', meaning: "Qovurilgan tovuq (yakitori)" },
+                { day: 6, word: '白鳥', reading: 'はくちょう', romaji: 'hakuchou', meaning: "Oqqush" },
+                { day: 6, word: '一石二鳥', reading: 'いっせきにちょう', romaji: 'isseki nichou', meaning: "Bir o'q bilan ikki quyonni urish" },
+                { day: 6, word: '馬', reading: 'うま', romaji: 'uma', meaning: "Ot" },
+                { day: 6, word: '競馬', reading: 'けいば', romaji: 'keiba', meaning: "Ot poygasi" },
+                { day: 6, word: '高田馬場', reading: 'たかだのばば', romaji: 'takadanobaba', meaning: "Takadanobaba (joy nomi)" },
+                { day: 6, word: '乗馬', reading: 'じょうば', romaji: 'jouba', meaning: "Otda yurish / Ot minish" },
+                { day: 6, word: '馬車', reading: 'ばしゃ', romaji: 'basha', meaning: "Aravacha (ot qo'shilgan)" },
+                { day: 6, word: '米', reading: 'こめ', romaji: 'kome', meaning: "Guruch" },
+                { day: 6, word: '米国', reading: 'べいこく', romaji: 'beikoku', meaning: "AQSH" },
+                { day: 6, word: '中米', reading: 'ちゅうべい', romaji: 'chuubei', meaning: "Markaziy Amerika" },
+                { day: 6, word: '夕', reading: 'ゆう', romaji: 'yuu', meaning: "Kechqurun" },
+                { day: 6, word: '夕べ', reading: 'ゆうべ', romaji: 'yuube', meaning: "Kecha kechqurun" },
+                { day: 6, word: '夕食', reading: 'ゆうしょく', romaji: 'yuushoku', meaning: "Kechki ovqat" },
+                { day: 6, word: '夕日', reading: 'ゆうひ', romaji: 'yuuhi', meaning: "Kun botishi" },
+                { day: 6, word: '七夕', reading: 'たなばた', romaji: 'tanabata', meaning: "Tanabata (To'quvchi yulduz bayrami)" },
+
+                // 7-KUN (牛, 黒, 口, 目)
+                { day: 7, word: '牛', reading: 'うし', romaji: 'ushi', meaning: "Sigir / Mol" },
+                { day: 7, word: '牛肉', reading: 'ぎゅうにく', romaji: 'gyuuniku', meaning: "Mol go'shti" },
+                { day: 7, word: '牛乳', reading: 'ぎゅうにゅう', romaji: 'gyuunyuu', meaning: "Sut" },
+                { day: 7, word: '牛丼', reading: 'ぎゅうどん', romaji: 'gyuudon', meaning: "Mol go'shtli guruch taomi" },
+                { day: 7, word: '黒', reading: 'くろ', romaji: 'kuro', meaning: "Qora rang" },
+                { day: 7, word: '黒い', reading: 'くろい', romaji: 'kuroi', meaning: "Qora (sifat)" },
+                { day: 7, word: '真っ黒な', reading: 'まっくろな', romaji: 'makkurona', meaning: "Qop-qora" },
+                { day: 7, word: '黒字', reading: 'くろじ', romaji: 'kuroji', meaning: "Foyda / Ortiqcha" },
+                { day: 7, word: '黒板', reading: 'こくばん', romaji: 'kokuban', meaning: "Qora doska" },
+                { day: 7, word: '口', reading: 'くち', romaji: 'kuchi', meaning: "Og'iz" },
+                { day: 7, word: '人口', reading: 'じんこう', romaji: 'jinkou', meaning: "Aholi" },
+                { day: 7, word: '出口', reading: 'でぐち', romaji: 'deguchi', meaning: "Chiqish" },
+                { day: 7, word: '入口', reading: 'いりぐち', romaji: 'iriguchi', meaning: "Kirish" },
+                { day: 7, word: '山口県', reading: 'やまぐちけん', romaji: 'yamaguchiken', meaning: "Yamaguchi prefekturasi" },
+                { day: 7, word: '目', reading: 'め', romaji: 'me', meaning: "Ko'z" },
+                { day: 7, word: '一日目', reading: 'ついたちめ', romaji: 'tsuitachime', meaning: "Birinchi kun" },
+                { day: 7, word: '目標', reading: 'もくひょう', romaji: 'mokuhyou', meaning: "Maqsad" },
+                { day: 7, word: '注目する', reading: 'ちゅうもくする', romaji: 'chuumoku suru', meaning: "Diqqat qilish / E'tibor berish" },
+                { day: 7, word: '目次', reading: 'もくじ', romaji: 'mokuji', meaning: "Mundarija" },
+
+                // 8-KUN (足, 耳, 手)
+                { day: 8, word: '足', reading: 'あし', romaji: 'ashi', meaning: "Oyoq" },
+                { day: 8, word: '遠足', reading: 'えんそく', romaji: 'ensoku', meaning: "Sayr-sayohat" },
+                { day: 8, word: '満足', reading: 'まんぞく', romaji: 'manzoku', meaning: "Qanoat / Mamnunlik" },
+                { day: 8, word: '一足', reading: 'いっそく', romaji: 'issoku', meaning: "Bir juft (poyabzal)" },
+                { day: 8, word: '耳', reading: 'みみ', romaji: 'mimi', meaning: "Quloq" },
+                { day: 8, word: '初耳', reading: 'はつみみ', romaji: 'hatsumimi', meaning: "Birinchi marta eshitish" },
+                { day: 8, word: '耳鼻科', reading: 'じびか', romaji: 'jibika', meaning: "LOR (quloq-burun-tomoq)" },
+                { day: 8, word: '耳かき', reading: 'みみかき', romaji: 'mimikaki', meaning: "Quloq tozalagich" },
+                { day: 8, word: '手', reading: 'て', romaji: 'te', meaning: "Qo'l" },
+                { day: 8, word: '相手', reading: 'あいて', romaji: 'aite', meaning: "Hamsuhbat / Raqib" },
+                { day: 8, word: '上手な', reading: 'じょうずな', romaji: 'jouzu na', meaning: "Mohir / Chapdast" },
+                { day: 8, word: '手紙', reading: 'てがみ', romaji: 'tegami', meaning: "Xat" },
+                { day: 8, word: '手伝う', reading: 'てつだう', romaji: 'tetsudau', meaning: "Yordam bermoq" },
+
+                // 9-KUN (肉, 弓, 矢, 糸)
+                { day: 9, word: '肉', reading: 'にく', romaji: 'niku', meaning: "Go'sht" },
+                { day: 9, word: '牛肉', reading: 'ぎゅうにく', romaji: 'gyuuniku', meaning: "Mol go'shti" },
+                { day: 9, word: '豚肉', reading: 'ぶたにく', romaji: 'butaniku', meaning: "Cho'chqa go'shti" },
+                { day: 9, word: '鶏肉', reading: 'とりにく', romaji: 'toriniku', meaning: "Tovuq go'shti" },
+                { day: 9, word: '肉屋', reading: 'にくや', romaji: 'nikuya', meaning: "Go'sht do'koni" },
+                { day: 9, word: '弓', reading: 'ゆみ', romaji: 'yumi', meaning: "Kamon" },
+                { day: 9, word: '弓道', reading: 'きゅうどう', romaji: 'kyuudou', meaning: "Kamondan o'q otish me'mori/sporti" },
+                { day: 9, word: '弓矢', reading: 'ゆみや', romaji: 'yumiya', meaning: "Kamon va o'q" },
+                { day: 9, word: '矢', reading: 'や', romaji: 'ya', meaning: "O'q" },
+                { day: 9, word: '矢印', reading: 'やじるし', romaji: 'yajirushi', meaning: "O'q belgisi (yo'nalish)" },
+                { day: 9, word: '無理矢理', reading: 'むりやり', romaji: 'muriyari', meaning: "Majburan" },
+                { day: 9, word: '糸', reading: 'いと', romaji: 'ito', meaning: "Ip" },
+                { day: 9, word: '毛糸', reading: 'けいと', romaji: 'keito', meaning: "Jun ip" },
+
+                // 10-KUN (力, 主, 本, 刀)
+                { day: 10, word: '力', reading: 'ちから', romaji: 'chikara', meaning: "Kuch" },
+                { day: 10, word: '学力', reading: 'がくりょく', romaji: 'gakuryoku', meaning: "Akademik qobiliyat / Bilim" },
+                { day: 10, word: '協力する', reading: 'きょうりょくする', romaji: 'kyouryoku suru', meaning: "Qo'llab-quvvatlash / Hamkorlik qilish" },
+                { day: 10, word: '努力', reading: 'どりょく', romaji: 'doryoku', meaning: "Intilish / Harakat qilish" },
+                { day: 10, word: '力む', reading: 'りきむ', romaji: 'rikimu', meaning: "Kuchanish / Zo'r berish" },
+                { day: 10, word: '主人', reading: 'しゅじん', romaji: 'shujin', meaning: "Usta / Birovning eri / Xo'jayin" },
+                { day: 10, word: '主', reading: 'おも', romaji: 'omo', meaning: "Boshliq / Asosiy" },
+                { day: 10, word: '持ち主', reading: 'もちぬし', romaji: 'mochinushi', meaning: "Egasi" },
+                { day: 10, word: '本', reading: 'ほん', romaji: 'hon', meaning: "Kitob / Asos" },
+                { day: 10, word: '日本', reading: 'にほん', romaji: 'nihon', meaning: "Yaponiya" },
+                { day: 10, word: '山本', reading: 'やまもと', romaji: 'yamamoto', meaning: "Yamamoto (familiya)" },
+                { day: 10, word: '本屋', reading: 'ほんや', romaji: 'honya', meaning: "Kitob do'koni" },
+                { day: 10, word: '一本', reading: 'いっぽん', romaji: 'ippon', meaning: "Bitta (uzun obyektlar uchun)" },
+                { day: 10, word: '刀', reading: 'かたな', romaji: 'katana', meaning: "Qilich" },
+                { day: 10, word: '日本刀', reading: 'にほんとう', romaji: 'nihontou', meaning: "Yapon qilichi" },
+                { day: 10, word: '刀打ち', reading: 'かたなうち', romaji: 'katanauchi', meaning: "Qilichni soqish/urish" },
+
+                // 11-KUN (先, 生, 父, 母)
+                { day: 11, word: '先生', reading: 'せんせい', romaji: 'sensei', meaning: "O'qituvchi" },
+                { day: 11, word: '先月', reading: 'せんげつ', romaji: 'sengetsu', meaning: "O'tgan oy" },
+                { day: 11, word: '先週', reading: 'せんしゅう', romaji: 'senshuu', meaning: "O'tgan hafta" },
+                { day: 11, word: '先に', reading: 'さきに', romaji: 'sakini', meaning: "Oldin / Avval" },
+                { day: 11, word: '学生', reading: 'がくせい', romaji: 'gakusei', meaning: "Talaba" },
+                { day: 11, word: '誕生日', reading: 'たんじょうび', romaji: 'tanjoubi', meaning: "Tug'ilgan kun" },
+                { day: 11, word: '生まれる', reading: 'うまれる', romaji: 'umareru', meaning: "Tug'ilmoq" },
+                { day: 11, word: '生け花', reading: 'いけばな', romaji: 'ikebana', meaning: "Gul aranjirovkasi" },
+                { day: 11, word: '生卵', reading: 'なまたまご', romaji: 'namatamago', meaning: "Xom tuxum" },
+                { day: 11, word: '父', reading: 'ちち', romaji: 'chichi', meaning: "Otam" },
+                { day: 11, word: 'お父さん', reading: 'おとうさん', romaji: 'otousan', meaning: "Otangiz / Dada" },
+                { day: 11, word: '祖父', reading: 'そふ', romaji: 'sofu', meaning: "Bobo" },
+                { day: 11, word: '父の日', reading: 'ちちのひ', romaji: 'chichinohi', meaning: "Otalar kuni" },
+                { day: 11, word: '母', reading: 'はは', romaji: 'haha', meaning: "Mening onam" },
+                { day: 11, word: 'お母さん', reading: 'おかあさん', romaji: 'okaasan', meaning: "Onangiz / Ona" },
+                { day: 11, word: '父母', reading: 'ちちはは', romaji: 'chichihaha', meaning: "Ota-onalar" },
+                { day: 11, word: '母国語', reading: 'ぼこくご', romaji: 'bokokugo', meaning: "Ona tili" },
+
+                // 12-KUN (一, 二, 三, 四)
+                { day: 12, word: '一', reading: 'いち', romaji: 'ichi', meaning: "Bitta / Bir" },
+                { day: 12, word: '一人', reading: 'ひとり', romaji: 'hitori', meaning: "O'zi / Bir o'zi" },
+                { day: 12, word: '一緒に', reading: 'いっしょに', romaji: 'isshoni', meaning: "Birga" },
+                { day: 12, word: '一度', reading: 'いちど', romaji: 'ichido', meaning: "Bir marta" },
+                { day: 12, word: '一日', reading: 'ついたち', romaji: 'tsuitachi', meaning: "Birinchi kun / Bir kun" },
+                { day: 12, word: '二', reading: 'に', romaji: 'ni', meaning: "Ikki" },
+                { day: 12, word: '二つ', reading: 'ふたつ', romaji: 'futatsu', meaning: "Ikkita" },
+                { day: 12, word: '二月', reading: 'にがつ', romaji: 'nigatsu', meaning: "Fevral" },
+                { day: 12, word: '二人', reading: 'ふたり', romaji: 'futari', meaning: "Ikki kishi" },
+                { day: 12, word: '二十日', reading: 'はつか', romaji: 'hatsuka', meaning: "20-kun / Yigirma kun" },
+                { day: 12, word: '三', reading: 'さん', romaji: 'san', meaning: "Uch" },
+                { day: 12, word: '三つ', reading: 'みっつ', romaji: 'mittsu', meaning: "3 ta" },
+                { day: 12, word: '三時', reading: 'さんじ', romaji: 'sanji', meaning: "Soat uch" },
+                { day: 12, word: '三人', reading: 'さんにん', romaji: 'sannin', meaning: "Uch kishi" },
+                { day: 12, word: '三日目', reading: 'みっかめ', romaji: 'mikkame', meaning: "Uchinchi kun" },
+                { day: 12, word: '四', reading: 'よん', romaji: 'yon', meaning: "To'rt" },
+                { day: 12, word: '四つ', reading: 'よっつ', romaji: 'yottsu', meaning: "4 ta" },
+                { day: 12, word: '四時', reading: 'よじ', romaji: 'yoji', meaning: "Soat to'rt" },
+                { day: 12, word: '四月', reading: 'しがつ', romaji: 'shigatsu', meaning: "Aprel" },
+                { day: 12, word: '四日', reading: 'よっか', romaji: 'yokka', meaning: "4-kun" },
+
+                // 13-KUN (五, 六, 七, 八)
+                { day: 13, word: '五', reading: 'ご', romaji: 'go', meaning: "Besh" },
+                { day: 13, word: '五つ', reading: 'いつつ', romaji: 'itsutsu', meaning: "Beshta" },
+                { day: 13, word: '五時', reading: 'ごじ', romaji: 'goji', meaning: "Soat besh" },
+                { day: 13, word: '五月', reading: 'ごがつ', romaji: 'gogatsu', meaning: "May" },
+                { day: 13, word: '五日', reading: 'いつか', romaji: 'itsuka', meaning: "5 kun / 5-kun" },
+                { day: 13, word: '六', reading: 'ろく', romaji: 'roku', meaning: "Olti" },
+                { day: 13, word: '六つ', reading: 'むっつ', romaji: 'muttsu', meaning: "Oltita" },
+                { day: 13, word: '六百', reading: 'ろっぴゃく', romaji: 'roppyaku', meaning: "Olti yuz" },
+                { day: 13, word: '六日', reading: 'むいか', romaji: 'muika', meaning: "Olti kun / 6-kun" },
+                { day: 13, word: '六分', reading: 'ろっぷん', romaji: 'roppun', meaning: "Olti daqiqa" },
+                { day: 13, word: '七', reading: 'なな', romaji: 'nana', meaning: "Yetti" },
+                { day: 13, word: '七つ', reading: 'ななつ', romaji: 'nanatsu', meaning: "Yettita" },
+                { day: 13, word: '七日', reading: 'なのか', romaji: 'nanoka', meaning: "Yetti kun / 7-kun" },
+                { day: 13, word: '七夕', reading: 'たなばた', romaji: 'tanabata', meaning: "Yulduzlar festivali" },
+                { day: 13, word: '七人', reading: 'しちにん', romaji: 'shichinin', meaning: "7 kishi" },
+                { day: 13, word: '八', reading: 'はち', romaji: 'hachi', meaning: "Sakkiz" },
+                { day: 13, word: '八つ', reading: 'やっつ', romaji: 'yattsu', meaning: "Sakkizta" },
+                { day: 13, word: '八百', reading: 'はっぴゃく', romaji: 'happyaku', meaning: "Sakkiz yuz" },
+                { day: 13, word: '八日', reading: 'ようか', romaji: 'youka', meaning: "Sakkiz kun / 8-kun" },
+                { day: 13, word: '八百屋', reading: 'やおや', romaji: 'yaoya', meaning: "Sabzavot do'koni" },
+
+                // 14-KUN (九, 十, 百, 千)
+                { day: 14, word: '九', reading: 'きゅう', romaji: 'kyuu', meaning: "To'qqiz" },
+                { day: 14, word: '九つ', reading: 'ここのつ', romaji: 'kokonotsu', meaning: "To'qqizta" },
+                { day: 14, word: '九時', reading: 'くじ', romaji: 'kuji', meaning: "Soat to'qqiz" },
+                { day: 14, word: '九日', reading: 'ここのか', romaji: 'kokonoka', meaning: "To'qqiz kun / 9-kun" },
+                { day: 14, word: '九州地方', reading: 'きゅうしゅうちほう', romaji: 'kyuushuu chihou', meaning: "Kyushu hududi" },
+                { day: 14, word: '十', reading: 'じゅう', romaji: 'juu', meaning: "O'n" },
+                { day: 14, word: '十日', reading: 'とおか', romaji: 'tooka', meaning: "O'n kun / 10-kun" },
+                { day: 14, word: '十分', reading: 'じゅうぶん', romaji: 'juubun', meaning: "Yetarli" },
+                { day: 14, word: '十歳', reading: 'じゅっさい', romaji: 'jussai', meaning: "O'n yoshda" },
+                { day: 14, word: '百', reading: 'ひゃく', romaji: 'hyaku', meaning: "Yuz" },
+                { day: 14, word: '三百', reading: 'さんびゃく', romaji: 'sanbyaku', meaning: "Uch yuz" },
+                { day: 14, word: '六百', reading: 'ろっぴゃく', romaji: 'roppyaku', meaning: "Olti yuz" },
+                { day: 14, word: '八百', reading: 'はっぴゃく', romaji: 'happyaku', meaning: "Sakkiz yuz" },
+                { day: 14, word: '百貨店', reading: 'ひゃっかてん', romaji: 'hyakkaten', meaning: "Universal do'kon (Univermag)" },
+                { day: 14, word: '千円', reading: 'せんえん', romaji: "sen'en", meaning: "Ming yen" },
+                { day: 14, word: '三千', reading: 'さんぜん', romaji: 'sanzen', meaning: "Uch ming" },
+
+                // 15-KUN (万, 年, 円, 上)
+                { day: 15, word: '一万', reading: 'いちまん', romaji: 'ichiman', meaning: "O'n ming" },
+                { day: 15, word: '十万', reading: 'じゅうまん', romaji: 'juuman', meaning: "Yuz ming" },
+                { day: 15, word: '百万', reading: 'ひゃくまん', romaji: 'hyakuman', meaning: "Bir million" },
+                { day: 15, word: '万能', reading: 'ばんのう', romaji: 'bannou', meaning: "Har tomonlama / Har narsaga qodir" },
+                { day: 15, word: '万引きする', reading: 'まんびきする', romaji: 'manbiki suru', meaning: "Do'konda o'g'rilik qilish" },
+                { day: 15, word: '一年生', reading: 'いちねんせい', romaji: 'ichinensei', meaning: "Birinchi kurs/sinf talabasi" },
+                { day: 15, word: '一年', reading: 'いちねん', romaji: 'ichinen', meaning: "Bir yil" },
+                { day: 15, word: '今年', reading: 'ことし', romaji: 'kotoshi', meaning: "Bu yil" },
+                { day: 15, word: '去年', reading: 'きょねん', romaji: 'kyonen', meaning: "O'tgan yili" },
+                { day: 15, word: '毎年', reading: 'まいとし', romaji: 'maitoshi', meaning: "Har yili" },
+                { day: 15, word: '百円', reading: 'ひゃくえん', romaji: 'hyakuen', meaning: "Yuz yen" },
+                { day: 15, word: '円い', reading: 'まるい', romaji: 'marui', meaning: "Dumaloq" },
+                { day: 15, word: '円安', reading: 'えんやす', romaji: 'enyasu', meaning: "Yena qadrsizlanishi" },
+                { day: 15, word: '円高', reading: 'えんだか', romaji: 'endaka', meaning: "Yena qadri oshishi" },
+                { day: 15, word: '上', reading: 'うえ', romaji: 'ue', meaning: "Yuqori / Ustida" },
+                { day: 15, word: '以上', reading: 'いじょう', romaji: 'ijou', meaning: "Bundan ortiq / ...dan ko'p" },
+                { day: 15, word: '上手な', reading: 'じょうずな', romaji: 'jouzu na', meaning: "Usta / Qobiliyatli" },
+                { day: 15, word: '上着', reading: 'うわぎ', romaji: 'uwagi', meaning: "Ustki kiyim" },
+                { day: 15, word: '上る', reading: 'のぼる', romaji: 'noboru', meaning: "Yuqoriga chiqmoq / Ko'tarilmoq" }
             ],
             n5_vocab: [
-                { word: '結婚します', reading: 'けっこんします', meaning: "Uylanmoq, turmush qurmoq" },
-                { word: '欲しい', reading: 'ほしい', meaning: "Xohlamoq" },
-                { word: '経済', reading: 'けいざい', meaning: "Iqtisod" },
-                { word: '電子レンジ', reading: 'でんしれんじ', meaning: "Mikroto'lqinli pech" },
-                { word: '生け花', reading: 'いけばな', meaning: "Ikebana" },
-                { word: '天気', reading: 'てんき', meaning: "Ob-havo" },
-                { word: 'お腹がすきました', reading: 'おなかがあきました', meaning: "Qornim ochdi" },
-                { word: 'お腹がいっぱいです', reading: 'おなかがいっぱいです', meaning: "Qornim to'q" },
-                { word: '何か', reading: 'なにか', meaning: "Nimadir" },
-                { word: 'どこか', reading: 'どこか', meaning: "Qayerdadir" },
-                { word: 'ゲームをします', reading: 'げーむをします', meaning: "O'yin o'ynamoq" },
-                { word: '〜のとき', reading: '〜のとき', meaning: "〜ning payti" },
-                { word: '疲れます', reading: 'つかれます', meaning: "Charchamoq" },
-                { word: '疲れました', reading: 'つかれました', meaning: "Charchadim" },
-                { word: '寂しい', reading: 'さびしい', meaning: "Sog'inish, yolg'izlanish" },
-                { word: '広い', reading: 'ひろい', meaning: "Keng" },
-                { word: '狭い', reading: 'せまい', meaning: "Tor" },
-                { word: 'アルバイト', reading: 'あるばいと', meaning: "Soatbay ish" },
-                { word: '歌舞伎', reading: 'かぶき', meaning: "Kabuki" },
-                { word: '晴れ', reading: 'はれ', meaning: "Ochiq-havo" },
-                { word: '雨', reading: 'あめ', meaning: "Yomg'ir" },
-                { word: '曇り', reading: 'くもり', meaning: "Bulutli" },
-                { word: '雪', reading: 'ゆき', meaning: "Qor" },
-                { word: 'お祭り', reading: 'おまつり', meaning: "Festival" },
-                { word: 'でも', reading: 'でも', meaning: "Ammo, lekin" },
-                { word: '初めて', reading: 'はじめて', meaning: "Birinchi marta" },
-                { word: '特に', reading: 'とくに', meaning: "Ayniqsa" }
+                { day: 1, word: '結婚します', reading: 'けっこんします', romaji: 'kekkon shimasu', meaning: "Uylanmoq" },
+                { day: 2, word: '天気', reading: 'てんき', romaji: 'tenki', meaning: "Ob-havo" },
+                { day: 3, word: '学校', reading: 'がっこう', romaji: 'gakkou', meaning: "Maktab" },
+                { day: 4, word: '先生', reading: 'せんせい', romaji: 'sensei', meaning: "O'qituvchi" },
+                { day: 5, word: '学生', reading: 'がくせい', romaji: 'gakusei', meaning: "Talaba" }
             ],
             grammar: [
-                {
-                    title: '〜たいです (Taidesu)',
-                    formula: 'Fe\'l (Mas-o\'zagi) + たいです',
-                    explanation: 'Biror harakatni bajarish istagini (xohlayman) bildiradi.',
-                    example_jp: '日本へ行きたいです。',
-                    example_reading: 'Nihon e ikitaidesu.',
-                    example_uz: 'Yaponiyaga borishni xohlayman.'
-                },
-                {
-                    title: '〜てください (Te kudasai)',
-                    formula: 'Fe\'l (Te-shakli) + ください',
-                    explanation: 'Iltimos, buyruq yoki taklifni bildirish uchun ishlatiladi.',
-                    example_jp: 'ここに名前を書いてください。',
-                    example_reading: 'Koko ni namae o kaite kudasai.',
-                    example_uz: 'Iltimos, bu yerga ismingizni yozing.'
-                },
-                {
-                    title: '〜ないでください (Naide kudasai)',
-                    formula: 'Fe\'l (Nai-shakli) + でください',
-                    explanation: 'Biror harakatni bajarmaslikni iltimos qilish uchun ishlatiladi.',
-                    example_jp: '写真を撮らないでください。',
-                    example_reading: 'Shashin o toranaide kudasai.',
-                    example_uz: 'Iltimos, rasmga olmang.'
-                },
-                {
-                    title: '〜たことがあります (Ta koto ga arimasu)',
-                    formula: 'Fe\'l (Ta-shakli) + ことがあります',
-                    explanation: 'O\'tmishdagi tajribani bildiradi.',
-                    example_jp: '富士山に登ったことがあります。',
-                    example_reading: 'Fujisan ni nobotta koto ga arimasu.',
-                    example_uz: 'Fuji tog\'iga chiqqanman.'
-                },
-                {
-                    title: '〜てもいいです (Te mo ii desu)',
-                    formula: 'Fe\'l (Te-shakli) + もいいです',
-                    explanation: 'Ruxsat so\'rash yoki ruxsat berish uchun ishlatiladi.',
-                    example_jp: '写真を撮ってもいいですか。',
-                    example_reading: 'Shashin o totte mo ii desu ka.',
-                    example_uz: 'Rasmga olsam bo\'ladimi?'
-                }
+                { day: 1, title: '〜たいです', formula: 'Fe\'l + たいです', explanation: 'Xohish-istakni bildiradi.', example_jp: '日本へ行きたいです。', example_reading: 'Nihon e ikitaidesu.', example_uz: 'Yaponiyaga borishni xohlayman.' },
+                { day: 2, title: '〜てください', formula: 'Fe\'l (Te) + ください', explanation: 'Iltimosni bildiradi.', example_jp: '書いてください。', example_reading: 'Kaite kudasai.', example_uz: 'Iltimos, yozing.' }
             ],
             dialogues: [
-                {
-                    title: "Do'konda xarid qilish",
-                    desc: "Kassir va xaridor o'rtasidagi muloqot",
-                    lines: [
-                        { speaker: "Kassir", jp: "いらっしゃいませ！", reading: "Irasshaimase!", uz: "Xush kelibsiz!" },
-                        { speaker: "Xaridor", jp: "すみません、これはいくらですか。", reading: "Sumimasen, kore wa ikura desu ka.", uz: "Kechirasiz, bu qancha turadi?" },
-                        { speaker: "Kassir", jp: "それは五百円です。", reading: "Sore wa gohyaku-en desu.", uz: "U 500 yen turadi." },
-                        { speaker: "Xaridor", jp: "じゃ、これをください。", reading: "Ja, kore o kudasai.", uz: "Unda, shuni bering." },
-                        { speaker: "Kassir", jp: "ありがとうございます！", reading: "Arigatou gozaimasu!", uz: "Katta rahmat!" }
-                    ]
-                },
-                {
-                    title: "Restoranda ovqat buyurtma qilish",
-                    desc: "Ofitsiant va mijoz suhbati",
-                    lines: [
-                        { speaker: "Ofitsiant", jp: "ご注文はお決まりですか。", reading: "Gochuumon wa okimari desu ka.", uz: "Buyurtmaga tayyormisiz?" },
-                        { speaker: "Mijoz", jp: "ラーメンを一つお願いします。", reading: "Raamen o hitotsu onegaishimasu.", uz: "Bitta ramen bering, iltimos." },
-                        { speaker: "Ofitsiant", jp: "かしこまりました。少々お待ちください。", reading: "Kashikomarimashita. Shou shou omachi kudasai.", uz: "Tushundim. Biroz kuting." },
-                        { speaker: "Mijoz", jp: "はい、ありがとうございます。", reading: "Hai, arigatou gozaimasu.", uz: "Xo'p, rahmat." }
-                    ]
-                },
-                {
-                    title: "Ko'chada yo'l so'rash",
-                    desc: "Sayyoh va mahalliy fuqaro",
-                    lines: [
-                        { speaker: "Sayyoh", jp: "すみません、駅はどこですか。", reading: "Sumimasen, eki wa doko desu ka.", uz: "Kechirasiz, stantsiya qayerda?" },
-                        { speaker: "Fuqaro", jp: "あそこを右に曲がってください。", reading: "Asoko o migi ni magatte kudasai.", uz: "Ana u yerdan o'ngga buring." },
-                        { speaker: "Sayyoh", jp: "まっすぐですか。", reading: "Massugu desu ka.", uz: "To'g'riyami?" },
-                        { speaker: "Fuqaro", jp: "はい、まっすぐ行くと右側にあります。", reading: "Hai, massugu iku to migigawa ni arimasu.", uz: "Ha, to'g'ri borsangiz o'ng tomonda bo'ladi." },
-                        { speaker: "Sayyoh", jp: "どうもありがとうございます！", reading: "Doumo arigatou gozaimasu!", uz: "Katta rahmat!" }
-                    ]
-                }
+                { day: 1, title: "Do'konda", desc: "Kassir va xaridor", lines: [{ speaker: "Kassir", jp: "いらっしゃいませ！", reading: "Irasshaimase!", uz: "Xush kelibsiz!" }] }
             ]
         };
 
+        let customWords = JSON.parse(localStorage.getItem('my_jp_custom_words') || '[]');
+        let selectedDays = Array.from({length: 19}, (_, i) => i + 1);
+
         let currentCategory = 'n5_kanji';
+        let sortMode = 'sequential';
+        let currentMode = 'flashcard';
+        let activeData = [];
         let currentIndex = 0;
         let currentGrammarIndex = 0;
         let currentDialogueIndex = 0;
         let isFlipped = false;
         let score = 0;
-        let mistakes = [];
         let currentAudioQuestion = null;
         let currentSpeechTarget = null;
-        let showMistakesOnly = false;
 
-        let speedTimer = null;
-        let timeLeft = 30;
-        let speedScore = 0;
-
-        function speakWord(text = null) {
-            const wordToSpeak = text || database[currentCategory][currentIndex].word;
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(wordToSpeak);
-                utterance.lang = 'ja-JP';
-                utterance.rate = 0.85;
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert("Brauzeringizda ovoz chiqaramaydi.");
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
             }
+            return arr;
         }
 
-        function speakGrammarExample() {
-            const text = database.grammar[currentGrammarIndex].example_jp;
-            speakWord(text);
+        function setSortMode(mode) {
+            sortMode = mode;
+            const seqBtn = document.getElementById('sort-sequential-btn');
+            const randBtn = document.getElementById('sort-random-btn');
+
+            if (mode === 'sequential') {
+                seqBtn.className = "bg-rose-600 text-white py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-lg";
+                randBtn.className = "bg-[#0f172a] text-gray-400 border border-gray-700/80 hover:text-white py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition";
+            } else {
+                randBtn.className = "bg-rose-600 text-white py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-lg";
+                seqBtn.className = "bg-[#0f172a] text-gray-400 border border-gray-700/80 hover:text-white py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition";
+            }
+            reshuffleData();
         }
 
-        function renderDialogue() {
-            const item = database.dialogues[currentDialogueIndex];
-            document.getElementById('dialogue-title').innerText = item.title;
-            document.getElementById('dialogue-desc').innerText = item.desc;
-            document.getElementById('dialogue-index').innerText = currentDialogueIndex + 1;
-            document.getElementById('dialogue-total').innerText = database.dialogues.length;
-
-            const container = document.getElementById('dialogue-lines-container');
+        function initDayCheckboxes() {
+            const container = document.getElementById('days-checkbox-container');
+            if (!container) return;
             container.innerHTML = '';
-
-            item.lines.forEach((line, idx) => {
-                const isEven = idx % 2 === 0;
-                const lineDiv = document.createElement('div');
-                lineDiv.className = `p-3.5 rounded-xl border flex justify-between items-center gap-3 ${
-                    isEven ? 'bg-[#0f172a] border-gray-800' : 'bg-slate-900/60 border-emerald-500/20'
-                }`;
-
-                lineDiv.innerHTML = `
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">${line.speaker}</span>
-                        <span class="text-sm font-bold text-white">${line.jp}</span>
-                        <span class="text-xs text-gray-400">${line.reading}</span>
-                        <span class="text-xs text-emerald-300 mt-1">${line.uz}</span>
-                    </div>
-                    <button type="button" onclick="speakWord('${line.jp}')" class="bg-[#1e293b] hover:bg-gray-800 border border-gray-700 p-2.5 rounded-xl text-emerald-400 transition flex-shrink-0">
-                        <i class="fa-solid fa-volume-high"></i>
-                    </button>
+            for (let i = 1; i <= 19; i++) {
+                const label = document.createElement('label');
+                label.className = "flex items-center gap-2 p-1.5 rounded hover:bg-gray-800 cursor-pointer text-xs";
+                const isChecked = selectedDays.includes(i) ? 'checked' : '';
+                label.innerHTML = `
+                    <input type="checkbox" value="${i}" ${isChecked} onchange="onDayCheckboxChange(this)" class="accent-rose-500 rounded cursor-pointer">
+                    <span>${i}-kun</span>
                 `;
-                container.appendChild(lineDiv);
-            });
-        }
-
-        function playFullDialogue() {
-            const lines = database.dialogues[currentDialogueIndex].lines;
-            let lineIdx = 0;
-
-            function playNextLine() {
-                if (lineIdx < lines.length) {
-                    const utterance = new SpeechSynthesisUtterance(lines[lineIdx].jp);
-                    utterance.lang = 'ja-JP';
-                    utterance.rate = 0.85;
-                    utterance.onend = () => {
-                        lineIdx++;
-                        setTimeout(playNextLine, 500);
-                    };
-                    window.speechSynthesis.speak(utterance);
-                }
+                container.appendChild(label);
             }
-
-            window.speechSynthesis.cancel();
-            playNextLine();
+            updateSelectedDaysText();
         }
 
-        function nextDialogue() {
-            if (currentDialogueIndex < database.dialogues.length - 1) {
-                currentDialogueIndex++;
-                renderDialogue();
+        function initCustomDaySelect() {
+            const select = document.getElementById('custom-day-select');
+            if (!select) return;
+            select.innerHTML = '';
+            for (let i = 1; i <= 19; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.innerText = `${i}-kun`;
+                select.appendChild(opt);
             }
         }
 
-        function prevDialogue() {
-            if (currentDialogueIndex > 0) {
-                currentDialogueIndex--;
-                renderDialogue();
+        function toggleDayDropdown() {
+            document.getElementById('day-dropdown-menu').classList.toggle('hidden');
+        }
+
+        function closeDayDropdown(e) {
+            const dropdown = document.getElementById('day-dropdown-menu');
+            const trigger = e.target.closest('[onclick*="toggleDayDropdown"]');
+            
+            if (dropdown && !dropdown.contains(e.target) && !trigger) {
+                dropdown.classList.add('hidden');
             }
         }
 
-        function checkDailyStreak() {
-            const lastVisit = localStorage.getItem('jp_last_visit');
-            let streak = parseInt(localStorage.getItem('jp_streak') || '0');
-            const today = new Date().toDateString();
-
-            if (lastVisit) {
-                const lastDate = new Date(lastVisit);
-                const currentDate = new Date();
-                const diffDays = Math.ceil(Math.abs(currentDate - lastDate) / (1000 * 60 * 60 * 24));
-
-                if (diffDays === 1 && lastVisit !== today) {
-                    streak += 1;
-                    localStorage.setItem('jp_streak', streak);
-                    localStorage.setItem('jp_last_visit', today);
-                } else if (diffDays > 1) {
-                    streak = 1;
-                    localStorage.setItem('jp_streak', streak);
-                    localStorage.setItem('jp_last_visit', today);
-                }
+        function onDayCheckboxChange(checkbox) {
+            const val = parseInt(checkbox.value);
+            if (checkbox.checked) {
+                if (!selectedDays.includes(val)) selectedDays.push(val);
             } else {
-                streak = 1;
-                localStorage.setItem('jp_streak', streak);
-                localStorage.setItem('jp_last_visit', today);
+                selectedDays = selectedDays.filter(d => d !== val);
             }
-
-            document.getElementById('daily-streak').innerText = streak;
+            selectedDays.sort((a,b) => a - b);
+            updateSelectedDaysText();
+            reshuffleData();
         }
 
-        function initDailyWord() {
-            const allWords = [...database.n5_kanji, ...database.n5_vocab];
-            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-            document.getElementById('daily-word').innerText = randomWord.word;
-            document.getElementById('daily-reading').innerText = `(${randomWord.reading})`;
-            document.getElementById('daily-meaning').innerText = randomWord.meaning;
+        function selectAllDays() {
+            selectedDays = Array.from({length: 19}, (_, i) => i + 1);
+            document.querySelectorAll('#days-checkbox-container input').forEach(cb => cb.checked = true);
+            updateSelectedDaysText();
+            reshuffleData();
         }
 
-        function updateCard() {
-            isFlipped = false;
-            document.getElementById('card-inner').classList.remove('rotate-y-180');
-            const card = database[currentCategory][currentIndex];
-            
-            document.getElementById('kanji-display').innerText = card.word;
-            document.getElementById('reading-display').innerText = card.reading;
-            document.getElementById('meaning-display').innerText = card.meaning;
-            document.getElementById('current-index').innerText = currentIndex + 1;
-            document.getElementById('total-cards').innerText = database[currentCategory].length;
-            
-            document.getElementById('card-category-label').innerText = 
-                currentCategory === 'n5_kanji' ? 'YAPONCHA KANJI (N5)' : 'YAPONCHA LUG\'AT (N5)';
+        function deselectAllDays() {
+            selectedDays = [];
+            document.querySelectorAll('#days-checkbox-container input').forEach(cb => cb.checked = false);
+            updateSelectedDaysText();
+            reshuffleData();
         }
 
-        function flipCard() {
-            isFlipped = !isFlipped;
-            const cardInner = document.getElementById('card-inner');
-            if(isFlipped) cardInner.classList.add('rotate-y-180');
-            else cardInner.classList.remove('rotate-y-180');
+        function toggleAllDays() {
+            if (selectedDays.length === 19) deselectAllDays();
+            else selectAllDays();
+        }
+
+        function updateSelectedDaysText() {
+            const txt = document.getElementById('selected-days-text');
+            if (!txt) return;
+            if (selectedDays.length === 19) txt.innerText = "Barcha kunlar (1-19)";
+            else if (selectedDays.length === 0) txt.innerText = "Hech qaysi kun tanlanmagan";
+            else txt.innerText = `${selectedDays.length} ta kun tanlandi (${selectedDays.join(', ')})`;
         }
 
         function changeCategory() {
             currentCategory = document.getElementById('level-select').value;
+            reshuffleData();
+        }
+
+        function reshuffleData() {
+            let base = [...(database[currentCategory] || [])];
+            let customFiltered = customWords.filter(w => w.cat === currentCategory);
+            let combined = [...base, ...customFiltered].filter(w => selectedDays.includes(w.day));
+
+            if (sortMode === 'random') {
+                activeData = shuffleArray(combined);
+            } else {
+                activeData = combined.sort((a,b) => a.day - b.day);
+            }
+
             currentIndex = 0;
-            updateCard();
-            generateQuiz();
-            generateAudioQuiz();
-            generateReverseQuiz();
-            renderList();
+            renderCurrentMode();
         }
 
-        function nextCard() {
-            if (currentIndex < database[currentCategory].length - 1) {
-                currentIndex++;
-                updateCard();
-            }
-        }
-
-        function prevCard() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateCard();
-            }
-        }
-
-        function updateGrammarCard() {
-            const item = database.grammar[currentGrammarIndex];
-            document.getElementById('grammar-title').innerText = item.title;
-            document.getElementById('grammar-formula').innerText = item.formula;
-            document.getElementById('grammar-explanation').innerText = item.explanation;
-            document.getElementById('grammar-example-jp').innerText = item.example_jp;
-            document.getElementById('grammar-example-reading').innerText = item.example_reading;
-            document.getElementById('grammar-example-uz').innerText = item.example_uz;
-            document.getElementById('grammar-index').innerText = currentGrammarIndex + 1;
-            document.getElementById('grammar-total').innerText = database.grammar.length;
-        }
-
-        function nextGrammar() {
-            if (currentGrammarIndex < database.grammar.length - 1) {
-                currentGrammarIndex++;
-                updateGrammarCard();
-            }
-        }
-
-        function prevGrammar() {
-            if (currentGrammarIndex > 0) {
-                currentGrammarIndex--;
-                updateGrammarCard();
-            }
-        }
-
-        function generateQuiz() {
-            const list = database[currentCategory];
-            const correct = list[Math.floor(Math.random() * list.length)];
-            document.getElementById('quiz-question').innerText = correct.word;
-
-            let options = getOptions(correct, list);
-            const container = document.getElementById('quiz-options');
-            container.innerHTML = '';
-
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm transition text-left";
-                btn.innerText = opt.meaning;
-                btn.onclick = () => handleAnswer(opt === correct, btn, correct, generateQuiz);
-                container.appendChild(btn);
+        function switchMode(mode) {
+            currentMode = mode;
+            const modes = ['flashcard', 'dialogue', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'list'];
+            modes.forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                const sec = document.getElementById(`section-${m}`);
+                if (btn) {
+                    if (m === mode) {
+                        btn.className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
+                    } else {
+                        btn.className = "px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap";
+                    }
+                }
+                if (sec) sec.classList.add('hidden');
             });
+
+            const activeSec = document.getElementById(`section-${mode}`);
+            if (activeSec) {
+                activeSec.classList.remove('hidden');
+                activeSec.classList.add('flex');
+            }
+
+            renderCurrentMode();
         }
 
-        function generateAudioQuiz() {
-            const list = database[currentCategory];
-            currentAudioQuestion = list[Math.floor(Math.random() * list.length)];
-
-            let options = getOptions(currentAudioQuestion, list);
-            const container = document.getElementById('audio-options');
-            container.innerHTML = '';
-
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm transition text-left";
-                btn.innerText = opt.meaning;
-                btn.onclick = () => handleAnswer(opt === currentAudioQuestion, btn, currentAudioQuestion, generateAudioQuiz);
-                container.appendChild(btn);
-            });
+        function renderCurrentMode() {
+            if (currentMode === 'flashcard') renderFlashcard();
+            else if (currentMode === 'dialogue') renderDialogue();
+            else if (currentMode === 'grammar') renderGrammar();
+            else if (currentMode === 'quiz') renderQuiz();
+            else if (currentMode === 'audio') renderAudio();
+            else if (currentMode === 'reverse') renderReverse();
+            else if (currentMode === 'speech') renderSpeech();
+            else if (currentMode === 'list') renderList();
         }
 
-        function playAudioQuestion() {
-            if(currentAudioQuestion) speakWord(currentAudioQuestion.word);
-        }
+        function renderFlashcard() {
+            isFlipped = false;
+            const inner = document.getElementById('card-inner');
+            if (inner) inner.classList.remove('rotate-y-180');
 
-        function generateReverseQuiz() {
-            const list = database[currentCategory];
-            const correct = list[Math.floor(Math.random() * list.length)];
-            document.getElementById('reverse-question').innerText = correct.meaning;
-
-            let options = getOptions(correct, list);
-            const container = document.getElementById('reverse-options');
-            container.innerHTML = '';
-
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3.5 rounded-xl text-base transition text-center font-bold";
-                btn.innerText = `${opt.word} (${opt.reading})`;
-                btn.onclick = () => handleAnswer(opt === correct, btn, correct, generateReverseQuiz);
-                container.appendChild(btn);
-            });
-        }
-
-        function generateSpeechTask() {
-            const list = database[currentCategory];
-            currentSpeechTarget = list[Math.floor(Math.random() * list.length)];
-            document.getElementById('speech-target').innerText = currentSpeechTarget.word;
-            document.getElementById('speech-target-reading').innerText = `${currentSpeechTarget.reading} (${currentSpeechTarget.meaning})`;
-            
-            const resDiv = document.getElementById('speech-result');
-            resDiv.classList.add('hidden');
-            document.getElementById('speech-status').innerText = "Mikrofon tugmasini bosing va yaponcha ayting...";
-        }
-
-        function startSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("Brauzeringiz ovoz tanish funksiyasini qo'llab-quvvatlamaydi.");
+            if (activeData.length === 0) {
+                document.getElementById('kanji-display').innerText = ' - ';
+                document.getElementById('reading-display').innerText = 'Ma\'lumot yo\'q';
+                document.getElementById('romaji-display').innerText = '';
+                document.getElementById('meaning-display').innerText = 'Kunlarni tanlang';
+                document.getElementById('current-index').innerText = '0';
+                document.getElementById('total-cards').innerText = '0';
                 return;
             }
 
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ja-JP';
-            recognition.interimResults = false;
-
-            const micBtn = document.getElementById('btn-mic');
-            const statusText = document.getElementById('speech-status');
-            const resDiv = document.getElementById('speech-result');
-
-            micBtn.classList.add('animate-pulse', 'bg-amber-500');
-            statusText.innerText = "Eshitilmoqda... Gapiring!";
-
-            recognition.start();
-
-            recognition.onresult = function(event) {
-                const spokenText = event.results[0][0].transcript;
-                micBtn.classList.remove('animate-pulse', 'bg-amber-500');
-                resDiv.classList.remove('hidden');
-                
-                if (spokenText.includes(currentSpeechTarget.word) || spokenText.includes(currentSpeechTarget.reading.split('/')[0].trim())) {
-                    resDiv.className = "mt-4 p-3 bg-emerald-900/50 border border-emerald-500 rounded-xl w-full text-sm text-emerald-300";
-                    resDiv.innerHTML = `<i class="fa-solid fa-circle-check"></i> Barakalla! Siz dedingiz: <strong>${spokenText}</strong> (+15 Ochko)`;
-                    score += 15;
-                    document.getElementById('streak').innerText = score;
-                } else {
-                    resDiv.className = "mt-4 p-3 bg-rose-900/50 border border-rose-500 rounded-xl w-full text-sm text-rose-300";
-                    resDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Qaytadan urinib ko'ring. Siz dedingiz: <strong>${spokenText}</strong>`;
-                }
-                statusText.innerText = "Tayyor!";
-            };
-
-            recognition.onerror = function() {
-                micBtn.classList.remove('animate-pulse', 'bg-amber-500');
-                statusText.innerText = "Xatolik yuz berdi. Qaytadan bosing.";
-            };
+            const current = activeData[currentIndex];
+            document.getElementById('kanji-display').innerText = current.word;
+            document.getElementById('reading-display').innerText = current.reading;
+            document.getElementById('romaji-display').innerText = current.romaji || '';
+            document.getElementById('meaning-display').innerText = current.meaning;
+            document.getElementById('current-index').innerText = currentIndex + 1;
+            document.getElementById('total-cards').innerText = activeData.length;
         }
 
-        function startSpeedChallenge() {
-            document.getElementById('speed-start-container').classList.add('hidden');
-            document.getElementById('speed-game-container').classList.remove('hidden');
-            document.getElementById('speed-game-container').classList.add('flex');
-            
-            timeLeft = 30;
-            speedScore = 0;
-            document.getElementById('timer-display').innerText = timeLeft;
-
-            speedTimer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer-display').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(speedTimer);
-                    endSpeedChallenge();
-                }
-            }, 1000);
-
-            nextSpeedQuestion();
+        function flipCard() {
+            if (activeData.length === 0) return;
+            isFlipped = !isFlipped;
+            const inner = document.getElementById('card-inner');
+            if (inner) inner.classList.toggle('rotate-y-180');
         }
 
-        function nextSpeedQuestion() {
-            const list = database[currentCategory];
-            const correct = list[Math.floor(Math.random() * list.length)];
-            document.getElementById('speed-question').innerText = correct.word;
+        function nextCard() {
+            if (activeData.length === 0) return;
+            currentIndex = (currentIndex + 1) % activeData.length;
+            renderFlashcard();
+        }
 
-            let options = getOptions(correct, list);
-            const container = document.getElementById('speed-options');
+        function prevCard() {
+            if (activeData.length === 0) return;
+            currentIndex = (currentIndex - 1 + activeData.length) % activeData.length;
+            renderFlashcard();
+        }
+
+        function speakWord() {
+            if (activeData.length === 0) return;
+            const item = activeData[currentIndex];
+            let text = item.word || item.reading;
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Dialogue Mode
+        function renderDialogue() {
+            const filtered = database.dialogues.filter(d => selectedDays.includes(d.day));
+            document.getElementById('dialogue-total').innerText = filtered.length;
+            if (filtered.length === 0) {
+                document.getElementById('dialogue-title').innerText = "Muloqot topilmadi";
+                document.getElementById('dialogue-desc').innerText = "Boshqa kunni tanlang";
+                document.getElementById('dialogue-lines-container').innerHTML = '';
+                document.getElementById('dialogue-index').innerText = '0';
+                return;
+            }
+            if (currentDialogueIndex >= filtered.length) currentDialogueIndex = 0;
+            const d = filtered[currentDialogueIndex];
+            document.getElementById('dialogue-index').innerText = currentDialogueIndex + 1;
+            document.getElementById('dialogue-title').innerText = d.title;
+            document.getElementById('dialogue-desc').innerText = d.desc;
+
+            const container = document.getElementById('dialogue-lines-container');
             container.innerHTML = '';
+            d.lines.forEach(l => {
+                const div = document.createElement('div');
+                div.className = "p-3 bg-[#0f172a] rounded-xl border border-gray-800 flex flex-col gap-1";
+                div.innerHTML = `
+                    <span class="text-xs text-rose-400 font-bold">${l.speaker}:</span>
+                    <span class="text-base text-white font-semibold">${l.jp}</span>
+                    <span class="text-xs text-amber-300 font-mono">${l.reading}</span>
+                    <span class="text-xs text-emerald-400">${l.uz}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function nextDialogue() {
+            const filtered = database.dialogues.filter(d => selectedDays.includes(d.day));
+            if (filtered.length === 0) return;
+            currentDialogueIndex = (currentDialogueIndex + 1) % filtered.length;
+            renderDialogue();
+        }
+
+        function prevDialogue() {
+            const filtered = database.dialogues.filter(d => selectedDays.includes(d.day));
+            if (filtered.length === 0) return;
+            currentDialogueIndex = (currentDialogueIndex - 1 + filtered.length) % filtered.length;
+            renderDialogue();
+        }
+
+        // Grammar Mode
+        function renderGrammar() {
+            const filtered = database.grammar.filter(g => selectedDays.includes(g.day));
+            document.getElementById('grammar-total').innerText = filtered.length;
+            if (filtered.length === 0) {
+                document.getElementById('grammar-title').innerText = "Grammatika topilmadi";
+                document.getElementById('grammar-formula').innerText = "-";
+                document.getElementById('grammar-explanation').innerText = "Tanlangan kunlar bo'yicha grammatika mavjud emas.";
+                document.getElementById('grammar-example-jp').innerText = "-";
+                document.getElementById('grammar-example-reading').innerText = "-";
+                document.getElementById('grammar-example-uz').innerText = "-";
+                document.getElementById('grammar-index').innerText = '0';
+                return;
+            }
+            if (currentGrammarIndex >= filtered.length) currentGrammarIndex = 0;
+            const g = filtered[currentGrammarIndex];
+            document.getElementById('grammar-index').innerText = currentGrammarIndex + 1;
+            document.getElementById('grammar-title').innerText = g.title;
+            document.getElementById('grammar-formula').innerText = g.formula;
+            document.getElementById('grammar-explanation').innerText = g.explanation;
+            document.getElementById('grammar-example-jp').innerText = g.example_jp;
+            document.getElementById('grammar-example-reading').innerText = g.example_reading;
+            document.getElementById('grammar-example-uz').innerText = g.example_uz;
+        }
+
+        function nextGrammar() {
+            const filtered = database.grammar.filter(g => selectedDays.includes(g.day));
+            if (filtered.length === 0) return;
+            currentGrammarIndex = (currentGrammarIndex + 1) % filtered.length;
+            renderGrammar();
+        }
+
+        function prevGrammar() {
+            const filtered = database.grammar.filter(g => selectedDays.includes(g.day));
+            if (filtered.length === 0) return;
+            currentGrammarIndex = (currentGrammarIndex - 1 + filtered.length) % filtered.length;
+            renderGrammar();
+        }
+
+        // Quiz Mode
+        function renderQuiz() {
+            const container = document.getElementById('quiz-options');
+            container.innerHTML = '';
+
+            if (activeData.length < 2) {
+                document.getElementById('quiz-question').innerText = "-";
+                container.innerHTML = "<p class='text-xs text-gray-400 text-center col-span-2'>Test uchun kamida 2 ta so'z tanlanishi kerak.</p>";
+                return;
+            }
+
+            const current = activeData[Math.floor(Math.random() * activeData.length)];
+            document.getElementById('quiz-question').innerText = current.word;
+
+            let options = [current];
+            while (options.length < Math.min(4, activeData.length)) {
+                let rand = activeData[Math.floor(Math.random() * activeData.length)];
+                if (!options.includes(rand)) options.push(rand);
+            }
+            options = shuffleArray(options);
 
             options.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = "bg-[#0f172a] hover:bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm transition text-left font-medium";
+                btn.className = "bg-[#0f172a] hover:bg-rose-900/40 border border-gray-700 p-3 rounded-xl text-sm font-semibold transition text-left";
+                btn.innerText = opt.meaning;
+                btn.onclick = () => checkQuizAnswer(opt === current, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(isCorrect, btn) {
+            if (isCorrect) {
+                btn.className = "bg-emerald-600 text-white border border-emerald-500 p-3 rounded-xl text-sm font-semibold text-left";
+                addScore(10);
+                setTimeout(renderQuiz, 800);
+            } else {
+                btn.className = "bg-rose-600 text-white border border-rose-500 p-3 rounded-xl text-sm font-semibold text-left";
+            }
+        }
+
+        // Audio Mode
+        function renderAudio() {
+            const container = document.getElementById('audio-options');
+            container.innerHTML = '';
+
+            if (activeData.length < 2) {
+                container.innerHTML = "<p class='text-xs text-gray-400 text-center col-span-2'>Audio test uchun yetarli so'z yo'q.</p>";
+                return;
+            }
+
+            currentAudioQuestion = activeData[Math.floor(Math.random() * activeData.length)];
+            playAudioQuestion();
+
+            let options = [currentAudioQuestion];
+            while (options.length < Math.min(4, activeData.length)) {
+                let rand = activeData[Math.floor(Math.random() * activeData.length)];
+                if (!options.includes(rand)) options.push(rand);
+            }
+            options = shuffleArray(options);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-[#0f172a] hover:bg-rose-900/40 border border-gray-700 p-3 rounded-xl text-sm font-semibold transition text-left";
                 btn.innerText = opt.meaning;
                 btn.onclick = () => {
-                    if (opt === correct) speedScore += 1;
-                    nextSpeedQuestion();
+                    if (opt === currentAudioQuestion) {
+                        btn.className = "bg-emerald-600 text-white p-3 rounded-xl text-sm font-semibold text-left";
+                        addScore(10);
+                        setTimeout(renderAudio, 800);
+                    } else {
+                        btn.className = "bg-rose-600 text-white p-3 rounded-xl text-sm font-semibold text-left";
+                    }
                 };
                 container.appendChild(btn);
             });
         }
 
-        function endSpeedChallenge() {
-            document.getElementById('speed-game-container').classList.add('hidden');
-            document.getElementById('speed-game-container').classList.remove('flex');
-            document.getElementById('speed-start-container').classList.remove('hidden');
-            
-            score += speedScore * 5;
-            document.getElementById('streak').innerText = score;
-            alert(`Vaqt tugadi! Siz ${speedScore} ta to'g'ri javob topdingiz va ${speedScore * 5} ochko ishlandingiz!`);
+        function playAudioQuestion() {
+            if (!currentAudioQuestion) return;
+            let utterance = new SpeechSynthesisUtterance(currentAudioQuestion.reading || currentAudioQuestion.word);
+            utterance.lang = 'ja-JP';
+            window.speechSynthesis.speak(utterance);
         }
 
-        function getOptions(correct, list) {
-            let options = [correct];
-            while (options.length < 4 && options.length < list.length) {
-                let randomItem = list[Math.floor(Math.random() * list.length)];
-                if (!options.includes(randomItem)) options.push(randomItem);
-            }
-            return options.sort(() => Math.random() - 0.5);
-        }
+        // Reverse Mode
+        function renderReverse() {
+            const container = document.getElementById('reverse-options');
+            container.innerHTML = '';
 
-        function handleAnswer(isCorrect, btn, questionObj, nextQuizFunc) {
-            if (isCorrect) {
-                btn.classList.add('bg-emerald-600', 'border-emerald-500');
-                score += 10;
-                document.getElementById('streak').innerText = score;
-                setTimeout(nextQuizFunc, 800);
-            } else {
-                btn.classList.add('bg-rose-600', 'border-rose-500');
-                if (!mistakes.includes(questionObj)) {
-                    mistakes.push(questionObj);
-                    document.getElementById('mistake-count').innerText = mistakes.length;
-                }
-            }
-        }
-
-        function renderList() {
-            const listContainer = document.getElementById('words-list');
-            listContainer.innerHTML = '';
-            const sourceList = showMistakesOnly ? mistakes : database[currentCategory];
-
-            if(sourceList.length === 0 && showMistakesOnly) {
-                listContainer.innerHTML = `<div class="text-center text-gray-500 text-sm py-4">Hozircha hech qanday xato yo'q!</div>`;
+            if (activeData.length < 2) {
+                document.getElementById('reverse-question').innerText = "-";
+                container.innerHTML = "<p class='text-xs text-gray-400 text-center col-span-2'>Test uchun kamida 2 ta so'z kerak.</p>";
                 return;
             }
 
-            sourceList.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "bg-[#0f172a] border border-gray-800 p-3 rounded-lg flex justify-between items-center text-sm";
-                div.innerHTML = `
-                    <div>
-                        <strong class="text-rose-400 text-base">${item.word}</strong> 
-                        <span class="text-xs text-gray-400">(${item.reading})</span>
-                    </div> 
-                    <div class="text-emerald-400 font-medium">${item.meaning}</div>`;
-                listContainer.appendChild(div);
+            const current = activeData[Math.floor(Math.random() * activeData.length)];
+            document.getElementById('reverse-question').innerText = current.meaning;
+
+            let options = [current];
+            while (options.length < Math.min(4, activeData.length)) {
+                let rand = activeData[Math.floor(Math.random() * activeData.length)];
+                if (!options.includes(rand)) options.push(rand);
+            }
+            options = shuffleArray(options);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-[#0f172a] hover:bg-rose-900/40 border border-gray-700 p-3 rounded-xl text-sm font-semibold transition text-center";
+                btn.innerHTML = `<span class="text-base text-white">${opt.word}</span> <span class="text-xs text-amber-300 block">${opt.reading}</span>`;
+                btn.onclick = () => {
+                    if (opt === current) {
+                        btn.className = "bg-emerald-600 text-white p-3 rounded-xl text-sm font-semibold text-center";
+                        addScore(10);
+                        setTimeout(renderReverse, 800);
+                    } else {
+                        btn.className = "bg-rose-600 text-white p-3 rounded-xl text-sm font-semibold text-center";
+                    }
+                };
+                container.appendChild(btn);
             });
+        }
+
+        // Speech Mode
+        function renderSpeech() {
+            if (activeData.length === 0) {
+                document.getElementById('speech-target').innerText = "-";
+                document.getElementById('speech-target-reading').innerText = "So'z yo'q";
+                return;
+            }
+            currentSpeechTarget = activeData[Math.floor(Math.random() * activeData.length)];
+            document.getElementById('speech-target').innerText = currentSpeechTarget.word;
+            document.getElementById('speech-target-reading').innerText = currentSpeechTarget.reading;
+            document.getElementById('speech-status').innerText = "Mikrofonni bosing va yaponcha ayting...";
+            const res = document.getElementById('speech-result');
+            res.classList.add('hidden');
+        }
+
+        function startSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("Brauzeringiz ovoz tanishni qo'llab-quvvatlamaydi.");
+                return;
+            }
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP';
+
+            document.getElementById('speech-status').innerText = "Eshitilmoqda...";
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const res = document.getElementById('speech-result');
+                res.classList.remove('hidden');
+
+                if (transcript === currentSpeechTarget.word || transcript === currentSpeechTarget.reading) {
+                    res.className = "mt-4 p-3 bg-emerald-950/80 border border-emerald-500 text-emerald-300 rounded-xl text-sm font-semibold";
+                    res.innerText = `Ajoyib! Siz aytdingiz: "${transcript}" (To'g'ri)`;
+                    addScore(15);
+                    setTimeout(renderSpeech, 1500);
+                } else {
+                    res.className = "mt-4 p-3 bg-rose-950/80 border border-rose-500 text-rose-300 rounded-xl text-sm font-semibold";
+                    res.innerText = `Qaytadan urinib ko'ring. Siz aytdingiz: "${transcript}"`;
+                }
+            };
+
+            recognition.onerror = () => {
+                document.getElementById('speech-status').innerText = "Xatolik yuz berdi. Qaytadan urinib ko'ring.";
+            };
+
+            recognition.start();
+        }
+
+        // Search / List Mode
+        function renderList() {
+            filterList();
         }
 
         function filterList() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const items = document.getElementById('words-list').children;
-            Array.from(items).forEach(item => {
-                const text = item.innerText.toLowerCase();
-                item.style.display = text.includes(query) ? 'flex' : 'none';
+            const input = document.getElementById('search-input');
+            const filter = input ? input.value.toLowerCase() : '';
+            const container = document.getElementById('words-list');
+            if (!container) return;
+
+            container.innerHTML = '';
+            let filtered = activeData.filter(w => 
+                w.word.toLowerCase().includes(filter) ||
+                w.reading.toLowerCase().includes(filter) ||
+                w.meaning.toLowerCase().includes(filter) ||
+                (w.romaji && w.romaji.toLowerCase().includes(filter))
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = "<p class='text-xs text-gray-400 text-center py-4'>Hech narsa topilmadi.</p>";
+                return;
+            }
+
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "p-3 bg-[#0f172a] rounded-xl border border-gray-800 flex justify-between items-center";
+                div.innerHTML = `
+                    <div>
+                        <div class="text-base font-bold text-white">${item.word} <span class="text-xs text-amber-400 font-normal">(${item.reading})</span></div>
+                        <div class="text-xs text-gray-400">${item.romaji || ''}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-semibold text-emerald-400">${item.meaning}</span>
+                        <span class="text-[10px] text-rose-400 block">${item.day}-kun</span>
+                    </div>
+                `;
+                container.appendChild(div);
             });
         }
 
-        function toggleMistakesFilter() {
-            showMistakesOnly = !showMistakesOnly;
-            const btn = document.getElementById('btn-mistakes-filter');
-            if(showMistakesOnly) {
-                btn.classList.add('bg-amber-600', 'text-white');
-            } else {
-                btn.classList.remove('bg-amber-600', 'text-white');
-            }
-            renderList();
+        // Add Custom Word
+        function openAddModal() {
+            document.getElementById('add-modal').classList.remove('hidden');
         }
 
-        function switchMode(mode) {
-            if (speedTimer) clearInterval(speedTimer);
-            window.speechSynthesis.cancel();
-
-            const sections = ['flashcard', 'dialogue', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'speed', 'list'];
-            sections.forEach(s => document.getElementById(`section-${s}`).classList.add('hidden'));
-
-            const buttons = ['flashcard', 'dialogue', 'grammar', 'quiz', 'audio', 'reverse', 'speech', 'speed', 'list'];
-            buttons.forEach(b => {
-                document.getElementById(`mode-${b}`).className = 
-                    "px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 whitespace-nowrap";
-            });
-
-            const levelSelect = document.getElementById('level-select');
-
-            document.getElementById(`section-${mode}`).classList.remove('hidden');
-            document.getElementById(`mode-${mode}`).className = "px-3 py-2 rounded-lg text-xs font-medium bg-[#e11d48] text-white flex items-center gap-1.5 whitespace-nowrap";
-
-            if (mode === 'grammar' || mode === 'dialogue') {
-                levelSelect.classList.add('hidden');
-            } else {
-                levelSelect.classList.remove('hidden');
-            }
-
-            if (mode === 'dialogue') renderDialogue();
-            if (mode === 'grammar') updateGrammarCard();
-            if (mode === 'quiz') generateQuiz();
-            if (mode === 'audio') generateAudioQuiz();
-            if (mode === 'reverse') generateReverseQuiz();
-            if (mode === 'speech') generateSpeechTask();
-            if (mode === 'list') renderList();
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.add('hidden');
         }
 
-        // Boshlang'ich yuklash
-        checkDailyStreak();
-        initDailyWord();
-        updateCard();
+        function saveCustomWord(e) {
+            e.preventDefault();
+            const day = parseInt(document.getElementById('custom-day-select').value);
+            const cat = document.getElementById('custom-cat-select').value;
+            const word = document.getElementById('custom-word').value;
+            const reading = document.getElementById('custom-reading').value;
+            const romaji = document.getElementById('custom-romaji').value;
+            const meaning = document.getElementById('custom-meaning').value;
+
+            const newWord = { day, cat, word, reading, romaji, meaning };
+            customWords.push(newWord);
+            localStorage.setItem('my_jp_custom_words', JSON.stringify(customWords));
+
+            closeAddModal();
+            e.target.reset();
+            reshuffleData();
+            alert("Yangi so'z muvaffaqiyatli saqlandi!");
+        }
+
+        function addScore(pts) {
+            score += pts;
+            document.getElementById('streak').innerText = score;
+        }
+
+        // Global click to handle dropdown closing
+        document.addEventListener('click', closeDayDropdown);
+
+        // Init App
+        window.onload = () => {
+            initDayCheckboxes();
+            initCustomDaySelect();
+            reshuffleData();
+        };
     </script>
 </body>
 </html>
