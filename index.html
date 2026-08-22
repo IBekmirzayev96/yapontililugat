@@ -78,11 +78,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
             <div class="relative" onclick="event.stopPropagation()">
                 <label class="text-[11px] text-gray-400 font-semibold mb-1 flex justify-between items-center">
-                    <span>DARS / KUN BO'LIMLARI (1-19):</span>
+                    <span>DARS / KUN BO'LIMLARI (1-20):</span>
                     <span class="text-rose-400 cursor-pointer hover:underline" onclick="toggleAllDays()">Barchasi / Tozalash</span>
                 </label>
                 <div onclick="toggleDayDropdown()" class="bg-[#1e293b] border border-gray-700 text-white text-sm rounded-lg px-4 py-2 flex justify-between items-center cursor-pointer min-h-[42px]">
-                    <span id="selected-days-text" class="truncate text-rose-400 font-semibold">1-19 kunlar tanlangan</span>
+                    <span id="selected-days-text" class="truncate text-rose-400 font-semibold">1-20 kunlar tanlangan</span>
                     <i class="fa-solid fa-chevron-down text-xs text-gray-400 ml-2"></i>
                 </div>
 
@@ -1341,7 +1341,7 @@
         };
 
         let customWords = JSON.parse(localStorage.getItem('my_jp_custom_words') || '[]');
-        let selectedDays = Array.from({length: 19}, (_, i) => i + 1);
+        let selectedDays = Array.from({length: 20}, (_, i) => i + 1);
 
         let currentCategory = 'n5_kanji';
         let sortMode = 'sequential';
@@ -1383,7 +1383,7 @@
             const container = document.getElementById('days-checkbox-container');
             if (!container) return;
             container.innerHTML = '';
-            for (let i = 1; i <= 19; i++) {
+            for (let i = 1; i <= 20; i++) {
                 const label = document.createElement('label');
                 label.className = "flex items-center gap-2 p-1.5 rounded hover:bg-gray-800 cursor-pointer text-xs";
                 const isChecked = selectedDays.includes(i) ? 'checked' : '';
@@ -1434,7 +1434,7 @@
         }
 
         function selectAllDays() {
-            selectedDays = Array.from({length: 19}, (_, i) => i + 1);
+            selectedDays = Array.from({length:20 }, (_, i) => i + 1);
             document.querySelectorAll('#days-checkbox-container input').forEach(cb => cb.checked = true);
             updateSelectedDaysText();
             reshuffleData();
@@ -1448,7 +1448,7 @@
         }
 
         function toggleAllDays() {
-            if (selectedDays.length === 19) deselectAllDays();
+            if (selectedDays.length === 20) deselectAllDays();
             else selectAllDays();
         }
 
